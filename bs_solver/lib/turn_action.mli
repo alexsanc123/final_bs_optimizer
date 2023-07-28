@@ -8,7 +8,11 @@ val check_opponent_win
   -> bool
 
 val useful_call : game_state:Game_state.t -> claim:Card.t * int -> bool
-val card_probability : game_state:Game_state.t -> claim:Card.t * int -> bool
+
+val card_probability
+  :  game_state:Game_state.t
+  -> claim:int * Card.t * int
+  -> float
 
 val assess_calling_bluff
   :  game_state:Game_state.t
@@ -31,3 +35,5 @@ val my_turn_action
   :  game_state:Game_state.t
   -> card:Card.t
   -> (Card.t * int) list
+
+val factorial : int -> int
