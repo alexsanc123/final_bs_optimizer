@@ -47,12 +47,67 @@ let useful_call ~(game_state : Game_state.t) ~(claim : Card.t * int) =
   else false
 ;;
 
-let card_probability ~(game_state : Game_state.t) ~(claim : Card.t * int) =
+
+let rec factorial number =
+  match number with 
+  | 0 -> 1
+  | _ -> number * factorial (number-1)
+;;
+
+
+
+
+
+let card_probability
+  ~(game_state : Game_state.t)
+  ~(claim : int * Card.t * int)
+  : float
+  =
   (*Relies on pure odds to assess whether or not we should call a bluff or
     not. Should return a bool! *)
-  ignore game_state;
-  ignore claim;
-  true
+  let who_claimed, card_claimed, num_claimed = claim in
+
+  let player_profile = Hashtbl.find_exn game_state.all_players who_claimed in 
+  let qty_player_has = Hashtbl.find_exn player_profile.cards card_claimed in 
+  let claim_difference = num_claimed - qty_player_has in
+  match claim_difference > 0 with
+  | false -> 1.0
+  | true -> (
+    let qty_players_have =
+      List.init game_state.player_count ~f:(fun id ->
+        let player_profile = Hashtbl.find_exn game_state.all_players id in
+        Hashtbl.find_exn player_profile.cards card_claimed)
+      |> List.fold ~init:0 ~f:(fun sum_so_far card_qty ->
+           sum_so_far + card_qty) in
+    let available_cards = 4 - qty_players_have
+
+
+  )
+
+  
+  let in_pot_hypothetically =
+    List.filter game_state.pot ~f:(fun (_, card_in_pot) ->
+      Card.compare card_claimed card_in_pot = 0)
+  in
+  let def_in_pot =
+    List.filter in_pot_hypothetically ~f:(fun (who_put, _) ->
+      who_put = game_state.my_id)
+    |> List.length
+  in
+  let unsure_qty_in_pot =
+    List.filter in_pot_hypothetically ~f:(fun (who_put, _) ->
+      who_put <> game_state.my_id)
+    |> List.length
+  in
+  
+
+
+
+  0.25
+;;
+
+let probability_based_call ~(probability : float) ?(threshold = 0.25) () =
+  Float.( <. ) probability threshold
 ;;
 
 let assess_calling_bluff ~(game_state : Game_state.t) ~(claim : Card.t * int)
@@ -70,7 +125,7 @@ let assess_calling_bluff ~(game_state : Game_state.t) ~(claim : Card.t * int)
        ]
        ~f:(fun strategy_check -> strategy_check)
   then true
-  else card_probability ~game_state ~claim
+  else let probability = card_probability ~game_state ~claim in probability_based_call ~probability 
 ;;
 
 let rec lie_with_last_card
