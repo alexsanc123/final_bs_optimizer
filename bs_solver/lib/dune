@@ -1,0 +1,6 @@
+(library
+ (name bs_solver)
+ (libraries async core core_unix.command_unix)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane)))
