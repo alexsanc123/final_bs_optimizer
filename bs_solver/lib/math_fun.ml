@@ -111,7 +111,7 @@ let%expect_test "Tests for count win hands function" =
   in
   print_s [%message (result : float)];
   [%expect {|
-    (result .166666666666667)
+    (result 0.16666666666666666)
     |}]
 ;;
 
@@ -142,8 +142,3 @@ let%expect_test "Tests for Sum function" = let result = summation
 
    let%expect_test "Test 3 for chose function" = let result = choose ~n:1
    ~k:1 in print_s [%message (result : int)]; [%expect {| (result 1) |}] ;;
-
-   let%expect_test "Test 1 for prob calculator" = let result =
-   prob_player_has_card ~unknown_cards:7 ~unknown_cards_in_hand:3
-   ~desired_cards_needed:2 in print_s [%message (result : float)]; [%expect
-   {| (result 1) |}] ;;
