@@ -161,7 +161,7 @@ let _evaluate_strategies ~(strategies : Strategy.t list) : Strategy.t =
     List.min_elt
       scored_strategies
       ~compare:(fun (_, score_one) (_, score_two) ->
-      Int.compare score_one score_two)
+        Int.compare score_one score_two)
   in
   match best_strategy with Some (strat, _) -> strat | _ -> []
 ;;
