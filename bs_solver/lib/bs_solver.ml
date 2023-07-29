@@ -1,2 +1,2 @@
 module Game = Game
-module Choose = Choose
+module Math_fun = Math_fun
