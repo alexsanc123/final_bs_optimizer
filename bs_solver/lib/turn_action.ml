@@ -46,9 +46,14 @@ let quantify_bluffs ~(strategy : Strategy.t) =
   List.length bluffs_list
 ;;
 
-let _evaluate_strategies ~(strategies : Strategy.t list) : Strategy.t =
+let _evaluate_strategies ~(win_cycle : (Card.t * int) list) : Strategy.t =
   (*Uses our predetermined scoring heuristics to evaluate the least risky
     strategy.*)
+  let strategies =
+    [ lie_with_last_card ~win_cycle ~strategy:[]
+      (*add more functionality for different strategies here*)
+    ]
+  in
   let scored_strategies =
     List.map strategies ~f:(fun strategy ->
       let score = quantify_bluffs ~strategy * 2 in
