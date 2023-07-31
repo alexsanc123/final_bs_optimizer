@@ -30,9 +30,7 @@ let winning_hands_helper
   ~desired_to_be_winning
   ~extra_desired_cards
   =
-  (* print_s [%message "winning cards helper: " (unknown_cards : int)
-     (desired_in_unknown : int) (hand_size : int) (desired_to_be_winning :
-     int) (extra_desired_cards : int)]; *)
+
   let desired_i_have = desired_to_be_winning + extra_desired_cards in
   let ways_to_sat_win_cond =
     choose ~n:desired_in_unknown ~k:desired_i_have
