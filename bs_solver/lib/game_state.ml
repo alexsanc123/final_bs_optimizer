@@ -88,17 +88,12 @@ let test_game_state () =
               (if player_id < 52 % player_count
                then (52 / player_count) + 1
                else 52 / player_count)
-          ; bluffs_completed = 0
+          ; bluffs = 0
           ; cards
           })
   in
   let game_state =
-    { round_num = 0
-    ; player_count
-    ; pot = []
-    ; all_players
-    ; my_id = my_pos
-    }
+    { round_num = 0; player_count; pot = []; all_players; my_id = my_pos }
   in
   print_s
     [%message (Hashtbl.find_exn game_state.all_players my_pos : Player.t)];
