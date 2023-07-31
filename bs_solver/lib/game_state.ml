@@ -68,6 +68,9 @@ let test_game_state () =
     ; Card.Ten
     ; Card.Queen
     ; Card.Six
+    ; Card.Seven
+    ; Card.Three
+    ; Card.Five
     ]
     ~f:(fun card -> My_cards.add_card my_cards ~card);
   let all_players = Int.Table.create () in
