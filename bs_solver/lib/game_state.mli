@@ -13,3 +13,4 @@ val card_on_turn : t -> Card.t
 val game_over : t -> bool
 val is_my_turn : t -> bool
 val whos_turn : t -> Player.t
+val test_game_state : unit -> t
