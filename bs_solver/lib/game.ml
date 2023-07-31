@@ -95,10 +95,14 @@ let my_moves game =
   print_endline "I made a move"
 ;;
 
-let bluff_recomendation _game =
+let bluff_recomendation ~game ~claim =
   print_endline
     "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
-  print_endline "No recommendation functionality integrated";
+  print_endline "Recommendation";
+  let should_i_call =
+    Call_actions.assess_calling_bluff ~game_state:game ~claim
+  in
+  print_s [%message (should_i_call : bool)];
   print_endline
     "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
 ;;
@@ -160,7 +164,9 @@ let showdown
 ;;
 
 let bluff_called ~(game : Game_state.t) ~(player : Player.t) ~cards_put_down =
-  bluff_recomendation game;
+  bluff_recomendation
+    ~game
+    ~claim:(player.id, Game_state.card_on_turn game, cards_put_down);
   print_s
     [%message
       "Has anyone called "
