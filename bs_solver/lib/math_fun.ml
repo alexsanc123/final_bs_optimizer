@@ -30,11 +30,12 @@ let winning_hands_helper
   ~desired_to_be_winning
   ~extra_desired_cards
   =
+
   let desired_i_have = desired_to_be_winning + extra_desired_cards in
   let ways_to_sat_win_cond =
     choose ~n:desired_in_unknown ~k:desired_i_have
   in
-  print_s [%message (ways_to_sat_win_cond : int)];
+  (* print_s [%message (ways_to_sat_win_cond : int)]; *)
   let ways_to_fill_rest =
     choose
       ~n:(unknown_cards - desired_in_unknown)
@@ -96,38 +97,46 @@ let prob_player_has_card
          ~hand_size
          ~desired_to_be_winning)
   in
-  print_s [%message (choose ~n:unknown_cards ~k:hand_size : int)];
+  (* print_s [%message (choose ~n:unknown_cards ~k:hand_size : int)]; *)
   let count_of_all_hands =
     Int.to_float (choose ~n:unknown_cards ~k:hand_size)
   in
-  print_s [%message (count_of_winning_hands : float)];
-  print_s [%message (count_of_all_hands : float)];
+  (* print_s [%message (count_of_winning_hands : float)]; print_s [%message
+     (count_of_all_hands : float)]; *)
   count_of_winning_hands /. count_of_all_hands
 ;;
 
 (*------------------------------------------Expect
   Test------------------------------------------------*)
 
-let%expect_test "Test1 for prob player has card" =
+let%expect_test "Test2 for prob player has card" =
   let result =
     prob_player_has_card
-      ~unknown_cards:40
-      ~desired_in_unknown:2
+      ~unknown_cards:44
+      ~desired_in_unknown:3
       ~hand_size:10
-      ~desired_to_be_winning:1
+      ~desired_to_be_winning:2
+  in
+  print_s [%message (result : float)];
+  [%expect {| (result 0.12458471760797342) |}]
+  (*not tested*)
+;;
+
+let%expect_test "Test2 for prob player has card" =
+  let result =
+    prob_player_has_card
+      ~unknown_cards:20
+      ~desired_in_unknown:6
+      ~hand_size:5
+      ~desired_to_be_winning:3
   in
   print_s [%message (result : float)];
   [%expect {|
-    (result 0.16666666666666666)
+    (result 0.13132094943240455)
     |}]
 ;;
 
-(* let%expect_test "Test2 for prob player has card" = let result =
-   prob_player_has_card ~unknown_cards:50 ~desired_in_unknown:4 ~hand_size:12
-   ~desired_to_be_winning:2 in print_s [%message (result : float)]; [%expect
-   {| (result 0.16666666666666666) |}] ;; *)
-
-let%expect_test "Test2 for prob player has card" =
+let%expect_test "Test1 for prob player has card" =
   let result =
     prob_player_has_card
       ~unknown_cards:4
@@ -141,7 +150,7 @@ let%expect_test "Test2 for prob player has card" =
     |}]
 ;;
 
-let%expect_test "Tests for count win hands function" =
+let%expect_test "Test for count win hands function" =
   let result =
     count_all_winning_hands
       ~unknown_cards:10
@@ -155,7 +164,7 @@ let%expect_test "Tests for count win hands function" =
     |}]
 ;;
 
-let%expect_test "Tests for Sum function" =
+let%expect_test "Test for Sum function" =
   let result =
     summation
       ~stop_cond:(fun int -> int > 10)
@@ -166,7 +175,7 @@ let%expect_test "Tests for Sum function" =
   [%expect {| (result 385) |}]
 ;;
 
-let%expect_test "Tests for choose function" =
+let%expect_test "Test 1 for choose function" =
   let result = choose ~n:10 ~k:3 in
   print_s [%message (result : int)];
   [%expect {| (result 120) |}]
@@ -179,7 +188,7 @@ let%expect_test "Test 2 for chose function" =
    |}]
 ;;
 
-let%expect_test "Test 3 for chose function" =
+let%expect_test "Test 1 for chose function" =
   let result = choose ~n:1 ~k:1 in
   print_s [%message (result : int)];
   [%expect {| (result 1) |}]
