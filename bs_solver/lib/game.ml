@@ -133,6 +133,9 @@ let showdown
   in
   let who_lost = match def_not_lying with true -> acc | false -> def in
   who_lost.hand_size <- who_lost.hand_size + List.length game.pot;
+  if who_lost.id = def.id
+  then def.bluffs_completed <- def.bluffs_completed + 1
+  else ();
   let _ =
     List.iter revealed_cards ~f:(fun card ->
       My_cards.add_card who_lost.cards ~card)
@@ -142,7 +145,7 @@ let showdown
     let _, rest_of_pot = List.split_n game.pot cards_put_down in
     print_s [%message (rest_of_pot : (int * Card.t) list)];
     let _ =
-      List.iter (List.rev rest_of_pot) ~f:(fun (_, card) ->
+      List.iter (List.rev rest_of_pot) ~f:(fun (pot_id, card) ->
         print_endline
           "Please specify the Rank of the card revealed e.g. 2 - \
            representing the Two";
@@ -152,7 +155,8 @@ let showdown
         match Card.equal actual_card card with
         | true -> ()
         | false ->
-          def.bluffs_completed <- def.bluffs_completed + 1;
+          let pot_player = Hashtbl.find_exn game.all_players pot_id in
+          pot_player.bluffs_completed <- pot_player.bluffs_completed + 1;
           My_cards.add_card acc.cards ~card)
     in
     ()
