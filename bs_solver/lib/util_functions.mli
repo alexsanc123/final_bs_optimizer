@@ -1,5 +1,6 @@
 open! Core
 
+val card_on_turn : int -> Card.t
 val chop_win_seq : (Card.t * int) list -> (Card.t * int) list
 
 val calc_win_cycle

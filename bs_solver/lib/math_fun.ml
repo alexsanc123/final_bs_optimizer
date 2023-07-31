@@ -30,9 +30,6 @@ let winning_hands_helper
   ~desired_to_be_winning
   ~extra_desired_cards
   =
-  print_s [%message "winning cards helper: " (unknown_cards : int)
-     (desired_in_unknown : int) (hand_size : int) (desired_to_be_winning :
-     int) (extra_desired_cards : int)];
   let desired_i_have = desired_to_be_winning + extra_desired_cards in
   let ways_to_sat_win_cond =
     choose ~n:desired_in_unknown ~k:desired_i_have
@@ -66,7 +63,9 @@ let count_all_winning_hands
   ~desired_to_be_winning
   =
   (* print_endline "Entered function"; *)
-  let stop_cond sum_var = sum_var > hand_size - desired_to_be_winning (* andd a second cond*)in
+  let stop_cond sum_var =
+    sum_var > hand_size - desired_to_be_winning (* andd a second cond*)
+  in
   (* print_endline "Computed stop cond"; *)
   let sum_func sum_var =
     winning_hands_helper
