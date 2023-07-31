@@ -2,16 +2,19 @@ open! Core
 open! In_channel
 
 let declare_player_count () =
-  print_endline "Please specify how many players are in the round ";
-  let player_count = In_channel.input_line_exn stdin in
+  let prompt = "Please specify how many players are in the round " in
+  let player_count = Stdinout.loop_num_input ~prompt in
+  (* print_endline "Please specify how many players are in the round "; let
+     player_count = In_channel.input_line_exn stdin in *)
   Int.of_string player_count
 ;;
 
 let declare_my_pos () =
-  print_endline
+  let prompt =
     "Please specify your seating index at the table clockwise from the 0th \
-     player (the player with the Ace of Spades): ";
-  let my_pos = In_channel.input_line_exn stdin in
+     player (the player with the Ace of Spades): "
+  in
+  let my_pos = Stdinout.loop_num_input ~prompt in
   Int.of_string my_pos
 ;;
 
@@ -23,12 +26,13 @@ let declare_my_cards ~my_pos ~player_count =
   in
   (* print_s[%message (hand_size:int)]; *)
   let my_cards = My_cards.init () in
+  let prompt =
+    "Please specify the Rank of the  card you received\n\
+    \         e.g. 2 - representing the Two"
+  in
   let _ =
     List.init hand_size ~f:(fun _ ->
-      print_endline
-        "Please specify the Rank of the  card you received\n\
-        \         e.g. 2 - representing the Two";
-      let card_input_string = In_channel.input_line_exn stdin in
+      let card_input_string = Stdinout.loop_card_input ~prompt in
       let card = Card.of_string card_input_string in
       My_cards.add_card my_cards ~card)
   in
