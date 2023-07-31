@@ -69,7 +69,7 @@ let%expect_test "Test 1 for calculating cards to provide." =
   let player =
     { Player.id = 3
     ; hand_size = 10
-    ; bluffs_completed = 2
+    ; bluffs = 2
     ; cards = Card.Table.create ()
     }
   in
@@ -104,7 +104,7 @@ let%expect_test "Test 2 for calculating cards to provide." =
   let player =
     { Player.id = 2
     ; hand_size = 15
-    ; bluffs_completed = 1
+    ; bluffs = 1
     ; cards = Card.Table.create ()
     }
   in
@@ -139,7 +139,7 @@ let%expect_test "Test 3 for calculating cards to provide." =
   let player =
     { Player.id = 5
     ; hand_size = 12
-    ; bluffs_completed = 0
+    ; bluffs = 0
     ; cards = Card.Table.create ()
     }
   in

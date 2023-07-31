@@ -61,7 +61,7 @@ let game_init () =
               (if player_id < 52 % player_count
                then (52 / player_count) + 1
                else 52 / player_count)
-          ; bluffs_completed = 0
+          ; bluffs = 0
           ; cards
           })
   in
@@ -133,9 +133,7 @@ let showdown
   in
   let who_lost = match def_not_lying with true -> acc | false -> def in
   who_lost.hand_size <- who_lost.hand_size + List.length game.pot;
-  if who_lost.id = def.id
-  then def.bluffs_completed <- def.bluffs_completed + 1
-  else ();
+  if who_lost.id = def.id then def.bluffs <- def.bluffs + 1 else ();
   let _ =
     List.iter revealed_cards ~f:(fun card ->
       My_cards.add_card who_lost.cards ~card)
@@ -156,7 +154,7 @@ let showdown
         | true -> ()
         | false ->
           let pot_player = Hashtbl.find_exn game.all_players pot_id in
-          pot_player.bluffs_completed <- pot_player.bluffs_completed + 1;
+          pot_player.bluffs <- pot_player.bluffs + 1;
           My_cards.add_card acc.cards ~card)
     in
     ()
