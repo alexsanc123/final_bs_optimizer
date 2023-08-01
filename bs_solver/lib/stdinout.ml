@@ -25,9 +25,25 @@ let card_form_checker input =
   match String.length input with
   | 1 ->
     if String.contains card_chars (Char.lowercase (String.get input 0))
-    then true
+    then (
+      print_endline "passed cfc";
+      true)
     else false
   | _ -> false
+;;
+
+let card_i_put_form_checker input ~(my_player : Player.t) =
+  let valid_input = card_form_checker input in
+  match valid_input with
+  | true ->
+    let card = Card.of_string input in
+    (match My_cards.do_i_have_enough my_player.cards ~card () with
+     | true ->
+       My_cards.rm_card my_player.cards ~card ();
+       print_endline "Used card";
+       true
+     | false -> false)
+  | false -> false
 ;;
 
 let num_form_checker input =
@@ -44,4 +60,12 @@ let loop_card_input ~prompt =
 
 let loop_num_input ~prompt =
   stdin_reprompt ~prompt ~form_checker:num_form_checker ()
+;;
+
+let loop_card_i_put_input ~prompt ~(game_state : Game_state.t) =
+  let my_player = Hashtbl.find_exn game_state.all_players game_state.my_id in
+  stdin_reprompt
+    ~prompt
+    ~form_checker:(card_i_put_form_checker ~my_player)
+    ()
 ;;

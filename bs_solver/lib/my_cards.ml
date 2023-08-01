@@ -17,8 +17,18 @@ let init () =
   my_cards
 ;;
 
+let do_i_have_enough t ~(card : Card.t) ?(how_much = 1) () =
+  Hashtbl.find_exn t card >= how_much
+;;
+
 let add_card t ~(card : Card.t) =
   Hashtbl.set t ~key:card ~data:(Hashtbl.find_exn t card + 1)
+;;
+
+let rm_card t ~(card : Card.t) ?(how_much = 1) () =
+  match do_i_have_enough t ~card ~how_much () with
+  | true -> Hashtbl.set t ~key:card ~data:(Hashtbl.find_exn t card - how_much)
+  | false -> failwith ("insufficient card count" ^ Card.to_string card)
 ;;
 
 (* include Hashable.Make (T) include
