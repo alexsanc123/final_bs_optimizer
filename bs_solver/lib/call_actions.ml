@@ -16,20 +16,14 @@ let conflicting_claim
   available_cards < num_claimed
 ;;
 
-let check_opponent_win
-  ~(game_state : Game_state.t)
-  ~(claim : int * Card.t * int)
-  =
-  (*If an opponent's claim on their turn allows them to win the game, call
-    bluff (GAME WOULD BE OVER IF THEY SUCCEEDED...) )*)
-  let opponent_id = game_state.round_num % game_state.player_count in
-  let opponent_profile =
-    Hashtbl.find_exn game_state.all_players opponent_id
-  in
-  let opponent_hand_size = opponent_profile.hand_size in
-  let _, _, num_claimed = claim in
-  num_claimed - opponent_hand_size = 0
-;;
+(* let check_opponent_win ~(game_state : Game_state.t) ~(claim : int * Card.t
+   * int) = (*If an opponent's claim on their turn allows them to win the
+   game, call bluff (GAME WOULD BE OVER IF THEY SUCCEEDED...) )*) (*assumes
+   players hand has already been decremented*) let opponent_id =
+   game_state.round_num % game_state.player_count in let opponent_profile =
+   Hashtbl.find_exn game_state.all_players opponent_id in let
+   opponent_hand_size = opponent_profile.hand_size in let _, _, num_claimed =
+   claim in num_claimed - opponent_hand_size = 0 ;; *)
 
 let useful_call ~(game_state : Game_state.t) ~(claim : int * Card.t * int) =
   (*Assesses if calling a bluff would be incentivized regardlesss of the
@@ -133,9 +127,11 @@ let assess_calling_bluff
     win the game, call bluff. Strategy 3: If the pot is less than 5 and the
     card they are claiming is within the next 4 of my win cycle, call the
     bluff. *)
+  let opp_id, _, _ = claim in
+  let opp = Hashtbl.find_exn game_state.all_players opp_id in
   if List.exists
        [ conflicting_claim ~game_state ~claim
-       ; check_opponent_win ~game_state ~claim
+       ; opp.hand_size = 0
        ; useful_call ~game_state ~claim
        ]
        ~f:(fun strategy_check -> strategy_check)
