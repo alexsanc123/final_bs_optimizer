@@ -117,8 +117,14 @@ let probability_based_call
   (*actually need to implement the logic for the threshold based on how the
     game is going*)
   let probability = prob_no_lie ~game_state ~claim in
-  print_s
-    [%message "Probability the player is not lying: " (probability : float)];
+  print_endline
+    ("Probability the opponent is lying: "
+     ^ Float.to_string
+         (100.0
+          -. Float.round_significant
+               ~significant_digits:4
+               (probability *. 100.0))
+     ^ "%");
   let threshold = 0.25 in
   Float.( <. ) probability threshold
 ;;
@@ -133,12 +139,20 @@ let assess_calling_bluff
     win the game, call bluff. Strategy 3: If the pot is less than 5 and the
     card they are claiming is within the next 4 of my win cycle, call the
     bluff. *)
-  if List.exists
-       [ conflicting_claim ~game_state ~claim
-       ; check_opponent_win ~game_state ~claim
-       ; useful_call ~game_state ~claim
-       ]
-       ~f:(fun strategy_check -> strategy_check)
-  then true
+  if conflicting_claim ~game_state ~claim
+  then (
+    print_endline
+      ("/n Probability the opponent is lying: " ^ Int.to_string 100 ^ "%");
+    true)
+  else if check_opponent_win ~game_state ~claim
+  then (
+    print_endline "/n Your opponent is about to win the game.";
+    true)
+  else if useful_call ~game_state ~claim
+  then (
+    print_endline
+      "/n The pot is small and you need one of these cards in your win \
+       cycle.";
+    true)
   else probability_based_call ~game_state ~claim
 ;;
