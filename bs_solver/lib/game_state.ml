@@ -1,13 +1,18 @@
 open! Core
 
-type t =
-  { mutable round_num : int
-  ; player_count : int
-  ; mutable pot : (int * Card.t) list
-  ; all_players : All_players.t
-  ; my_id : int
-  }
-[@@deriving fields, sexp]
+module T = struct
+  type t =
+    { mutable round_num : int
+    ; player_count : int
+    ; mutable pot : (int * Card.t) list
+    ; all_players : All_players.t
+    ; my_id : int
+    }
+  [@@deriving fields, sexp]
+end
+
+include T
+include Sexpable.To_stringable (T)
 
 let card_on_turn t =
   match (t.round_num + 1) % 13 with
