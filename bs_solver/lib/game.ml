@@ -111,7 +111,7 @@ let showdown
   in
   let card_on_turn = Game_state.card_on_turn game in
   let _, rest_of_pot = List.split_n game.pot num_cards_claimed in
-  print_s [%message (rest_of_pot : (int * Card.t) list)];
+  (* print_s [%message (rest_of_pot : (int * Card.t) list)]; *)
   let revealed_cards =
     List.init num_cards_claimed ~f:(fun _ ->
       let card_input_string = Stdinout.loop_card_input ~prompt in

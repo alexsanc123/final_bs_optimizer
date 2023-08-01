@@ -34,7 +34,8 @@ let rec lie_with_last_card
        lie_with_last_card ~win_cycle:(chop_win_seq rest_win) ~strategy)
 ;;
 
-let quantify_bluffs ~(strategy : Strategy.t) =
+let count_bluffs ~(strategy : Strategy.t) =
+  (*Counts bluffs*)
   let bluffs_on_turn =
     List.map strategy ~f:(fun (card_needed, what_to_use_list) ->
       List.exists what_to_use_list ~f:(fun card_to_use ->
@@ -56,7 +57,7 @@ let _evaluate_strategies ~(win_cycle : (Card.t * int) list) : Strategy.t =
   in
   let scored_strategies =
     List.map strategies ~f:(fun strategy ->
-      let score = quantify_bluffs ~strategy * 2 in
+      let score = count_bluffs ~strategy * 2 in
       (*add any other additional scoring with increased functionality*)
       strategy, score)
   in
@@ -182,7 +183,7 @@ let%expect_test "Test 1 for quanitfying bluffs." =
   in
   let strategy = [] in
   let lie_w_last = lie_with_last_card ~win_cycle ~strategy in
-  let how_many_bluffs = quantify_bluffs ~strategy:lie_w_last in
+  let how_many_bluffs = count_bluffs ~strategy:lie_w_last in
   print_endline (Int.to_string how_many_bluffs);
   [%expect {|
     3
@@ -203,7 +204,7 @@ let%expect_test "Test 2 for quantifying bluffs." =
   in
   let strategy = [] in
   let lie_w_last = lie_with_last_card ~win_cycle ~strategy in
-  let how_many_bluffs = quantify_bluffs ~strategy:lie_w_last in
+  let how_many_bluffs = count_bluffs ~strategy:lie_w_last in
   print_endline (Int.to_string how_many_bluffs);
   [%expect {|
     2
