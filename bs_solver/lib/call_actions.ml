@@ -96,7 +96,8 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
   in
   let desired_in_unknown = 4 - known_desired_qty in
   let hand_size =
-    (Hashtbl.find_exn game_state.all_players who_claimed).hand_size + num_claimed
+    (Hashtbl.find_exn game_state.all_players who_claimed).hand_size
+    + num_claimed
   in
   let unknown_cards = 52 - all_known_cards in
   let probability =
@@ -116,7 +117,8 @@ let probability_based_call
   (*actually need to implement the logic for the threshold based on how the
     game is going*)
   let probability = prob_no_lie ~game_state ~claim in
-  print_s[%message "Probability the player is not lying: " (probability:float)];
+  print_s
+    [%message "Probability the player is not lying: " (probability : float)];
   let threshold = 0.25 in
   Float.( <. ) probability threshold
 ;;

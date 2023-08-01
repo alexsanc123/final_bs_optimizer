@@ -1,6 +1,11 @@
 open! Core
 
-type t = int Card.Table.t [@@deriving sexp]
+module T = struct
+  type t = int Card.Table.t [@@deriving sexp]
+end
+
+include T
+include Sexpable.To_stringable (T)
 
 let init () =
   let my_cards = Card.Table.create () in

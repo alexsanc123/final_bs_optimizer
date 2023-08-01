@@ -9,6 +9,8 @@ type t =
   }
 [@@deriving fields, sexp]
 
+include Stringable.S with type t := t
+
 val card_on_turn : t -> Card.t
 val game_over : t -> bool
 val is_my_turn : t -> bool

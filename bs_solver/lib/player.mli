@@ -7,3 +7,5 @@ type t =
   ; mutable cards : int Card.Table.t
   }
 [@@deriving sexp, fields]
+
+include Stringable.S with type t := t
