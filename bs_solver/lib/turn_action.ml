@@ -47,6 +47,106 @@ let count_bluffs ~(strategy : Strategy.t) =
   List.length bluffs_list
 ;;
 
+let pop_tail list_to =
+  let beg_list, _ = List.split_n list_to (List.length list_to - 1) in
+  List.last_exn list_to, beg_list
+;;
+
+let pop_head list_to =
+  let _, tl_list = List.split_n list_to 1 in
+  List.hd_exn list_to, tl_list
+;;
+
+let change_existing_strat
+  ~(strategy : Strategy.t)
+  ~(update : Card.t * Card.t list)
+  =
+  let _, cards_put = update in
+  let tl_strat, beg_strat = pop_tail strategy in
+  let tl_card_claimed, tl_cards_put = tl_strat in
+  let new_tl = tl_card_claimed, tl_cards_put @ cards_put in
+  beg_strat @ [ new_tl ]
+;;
+
+let rec lie_or_not
+  ~(win_cycle : (Card.t * int) list)
+  ~(strategy : Strategy.t)
+  : Strategy.t list
+  =
+  (*Either lies with last card or does not*)
+  match win_cycle with
+  | [] -> [ strategy ]
+  | _ ->
+    let hd_win_cycle, rest_win = List.split_n win_cycle 1 in
+    let card, how_many = List.hd_exn hd_win_cycle in
+    (match how_many with
+     | 0 ->
+       let (last_card, qty), beg_rest_win = pop_tail rest_win in
+       let left_children, r_strategy, r_win_cycle =
+         match qty with
+         | 1 ->
+           let strategy = strategy @ [ card, [ last_card ] ] in
+           ( lie_or_not ~win_cycle:(chop_win_seq beg_rest_win) ~strategy
+           , strategy
+           , chop_win_seq beg_rest_win )
+         | _ ->
+           let strategy = strategy @ [ card, [ last_card ] ] in
+           let new_win_cycle =
+             chop_win_seq (beg_rest_win @ [ last_card, qty - 1 ])
+           in
+           ( lie_or_not ~win_cycle:new_win_cycle ~strategy
+           , strategy
+           , new_win_cycle )
+       in
+       if List.length r_win_cycle = 0
+       then left_children
+       else (
+         let (last_card, qty), beg_rest_win = pop_tail r_win_cycle in
+         let right_children =
+           match qty with
+           | 1 ->
+             let strategy =
+               change_existing_strat
+                 ~strategy:r_strategy
+                 ~update:(card, [ last_card ])
+             in
+             lie_or_not ~win_cycle:(chop_win_seq beg_rest_win) ~strategy
+           | _ ->
+             let strategy =
+               change_existing_strat
+                 ~strategy:r_strategy
+                 ~update:(card, [ last_card ])
+             in
+             let new_win_cycle = beg_rest_win @ [ last_card, qty - 1 ] in
+             lie_or_not ~win_cycle:(chop_win_seq new_win_cycle) ~strategy
+         in
+         left_children @ right_children)
+     | _ ->
+       let cards_to_provide = List.init how_many ~f:(fun _ -> card) in
+       let strategy = strategy @ [ card, cards_to_provide ] in
+       let new_win_cycle = chop_win_seq rest_win in
+       let left_children = lie_or_not ~win_cycle:new_win_cycle ~strategy in
+       if List.length new_win_cycle = 0
+       then left_children
+       else (
+         let (last_card, qty), beg_rest_win = pop_tail new_win_cycle in
+         let right_children =
+           match qty with
+           | 1 ->
+             let strategy =
+               change_existing_strat ~strategy ~update:(card, [ last_card ])
+             in
+             lie_or_not ~win_cycle:(chop_win_seq beg_rest_win) ~strategy
+           | _ ->
+             let strategy =
+               change_existing_strat ~strategy ~update:(card, [ last_card ])
+             in
+             let new_win_cycle = beg_rest_win @ [ last_card, qty - 1 ] in
+             lie_or_not ~win_cycle:(chop_win_seq new_win_cycle) ~strategy
+         in
+         left_children @ right_children))
+;;
+
 let _evaluate_strategies ~(win_cycle : (Card.t * int) list) : Strategy.t =
   (*Uses our predetermined scoring heuristics to evaluate the least risky
     strategy.*)
@@ -86,6 +186,12 @@ let _act_on_strategy ~(strategy : Strategy.t) ~(card_to_provide : Card.t)
 (***********************************************************************************)
 (*Expect tests for using the strategy to lie with the last card.*)
 
+let%expect_test "Test" =
+  let tl, beg = pop_head [ 1; 2; 3; 4 ] in
+  print_s [%message (tl : int) (beg : int list)];
+  [%expect {| ((tl 4) (beg (1 2 3))) |}]
+;;
+
 let%expect_test "Test 1 for lying with the last card." =
   let win_cycle =
     [ Card.of_string "4", 3
@@ -124,6 +230,36 @@ let%expect_test "Test 1 for lying with the last card." =
     (card_to_use Three)
     |}]
 ;;
+
+let%expect_test "Test for lie or not" =
+  let win_cycle =
+    [ Card.of_string "6", 1
+    ; Card.of_string "Q", 0
+    ; Card.of_string "5", 3
+    ; Card.of_string "J", 2
+    ; Card.of_string "4", 0
+    ; Card.of_string "T", 1
+    ; Card.of_string "3", 2
+    ; Card.of_string "9", 1
+    ]
+  in
+  let strategy = [] in
+  let lie_w_last = lie_or_not ~win_cycle ~strategy in
+  List.iter lie_w_last ~f:(fun strategy ->
+    print_s [%message (strategy : Strategy.t)];
+    print_endline "")
+;;
+
+(* print_s[%message (lie_w_last:(Strategy.t list))]; *)
+(* List.iter lie_w_last ~f:(fun strategy -> List.iter strategy ~f:(fun
+   (card_to_provide, card_to_use_list) -> print_s [%message (card_to_provide
+   : Card.t)]; List.iter card_to_use_list ~f:(fun card_to_use -> print_s
+   [%message (card_to_use : Card.t)]))); [%expect {| (card_to_provide Six)
+   (card_to_use Six) (card_to_provide Queen) (card_to_use Nine)
+   (card_to_provide Five) (card_to_use Five) (card_to_use Five) (card_to_use
+   Five) (card_to_provide Jack) (card_to_use Jack) (card_to_use Jack)
+   (card_to_provide Four) (card_to_use Three) (card_to_provide Ten)
+   (card_to_use Ten) (card_to_provide Three) (card_to_use Three) |}] *)
 
 let%expect_test "Test 2 for lying with the last card." =
   let win_cycle =

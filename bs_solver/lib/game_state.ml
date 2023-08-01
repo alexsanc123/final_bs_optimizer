@@ -42,7 +42,8 @@ let game_over t =
     | false ->
       (match player.hand_size = 0 with
        | true ->
-         print_s [%message "player" (player_id : int) "won the game"];
+        let message = "player" ^ (Int.to_string (player_id)) ^ "won the game" in
+         print_endline message;
          true
        | false -> false))
 ;;
