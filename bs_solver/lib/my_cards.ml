@@ -31,5 +31,9 @@ let rm_card t ~(card : Card.t) ?(how_much = 1) () =
   | false -> failwith ("insufficient card count" ^ Card.to_string card)
 ;;
 
+let clear_cards ~(player:Player.t) = 
+  player.cards <- init ()
+;;
+
 (* include Hashable.Make (T) include
    Hashable.Make_plain_and_derive_hash_fold_t (T) *)

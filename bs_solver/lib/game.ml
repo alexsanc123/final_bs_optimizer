@@ -144,7 +144,7 @@ let showdown
       if pot_id = game.my_id then My_cards.add_card who_lost.cards ~card)
 ;;
 
-let bluff_called
+let check_bluff_called
   ~(game : Game_state.t)
   ~(player : Player.t)
   ~num_cards_claimed
@@ -162,26 +162,24 @@ let bluff_called
   (*bluff called when you turn and opp might call you. Dont call your own
     bluff*)
   | true ->
-    print_s
-      [%message
-        "Has anyone called "
-          (player.id : int)
-          "bluff. Type 'me' if you would like to call"];
-    let caller = In_channel.input_line_exn stdin in
-    if String.equal (String.lowercase caller) "me"
-    then
-      showdown
-        ~game
-        ~acc:(Hashtbl.find_exn game.all_players game.my_id)
-        ~def:player
-        ~num_cards_claimed
-    else (
-      let caller_id = Int.of_string caller in
-      showdown
-        ~game
-        ~acc:(Hashtbl.find_exn game.all_players caller_id)
-        ~def:player
-        ~num_cards_claimed)
+    let prompt =
+      "Type in the id of the player who called the bluff or 'me' if you \
+       called bluff"
+    in
+    let caller =
+      Stdinout.loop_bluff_input
+        ~prompt
+        ~bluffer_id:player.id
+        ~my_id:game.my_id
+    in
+    let caller_id =
+      match caller with "me" -> game.my_id | _ -> Int.of_string caller
+    in
+    showdown
+      ~game
+      ~acc:(Hashtbl.find_exn game.all_players caller_id)
+      ~def:player
+      ~num_cards_claimed
   | false -> ()
 ;;
 
@@ -210,7 +208,7 @@ let my_moves game =
   in
   game.pot <- cards_put_down @ game.pot;
   player.hand_size <- player.hand_size - count;
-  bluff_called ~game ~player ~num_cards_claimed:count;
+  check_bluff_called ~game ~player ~num_cards_claimed:count;
   print_endline ("Cards left after move: " ^ Int.to_string player.hand_size);
   print_endline "I made a move"
 ;;
@@ -231,7 +229,7 @@ let opp_moves game =
   game.pot <- added_cards @ game.pot;
   print_s [%message (game.pot : (int * Card.t) list)];
   print_endline "Opp made a move";
-  bluff_called ~game ~player ~num_cards_claimed;
+  check_bluff_called ~game ~player ~num_cards_claimed;
   print_s [%message "Cards left after move: " (player.hand_size : int)]
 ;;
 

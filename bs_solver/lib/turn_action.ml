@@ -159,8 +159,8 @@ let score_strategy ~strategy ~(game_state : Game_state.t) : float =
         Card.equal card last_card_to_provide)
     in
     let end_multiplier = if end_on_truth then 1.0 else 2.0 in
-    let call_density =
-      Int.to_float
+    let call_multiplier =
+      1.0 +. (Int.to_float
         (Hashtbl.fold
            game_state.all_players
            ~init:0
@@ -168,7 +168,7 @@ let score_strategy ~strategy ~(game_state : Game_state.t) : float =
            if id = game_state.my_id
            then sum_of_bluffs
            else sum_of_bluffs + player.bluffs))
-      /. Int.to_float (Hashtbl.length game_state.all_players - 1)
+      /. Int.to_float (Hashtbl.length game_state.all_players - 1))
     in
     let _, bluffs_score =
       List.fold
@@ -180,8 +180,11 @@ let score_strategy ~strategy ~(game_state : Game_state.t) : float =
         in
         if Strategy.move_is_bluff move
         then (
+          let _, cards_placed = move in
           let new_score =
-            (score +. Int.to_float curr_pot_size) *. call_density
+            (score +. Int.to_float curr_pot_size)
+            *. call_multiplier
+            *. Int.to_float (List.length cards_placed)
           in
           new_pot_size, new_score)
         else new_pot_size, score)
@@ -196,23 +199,37 @@ let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
   (*Uses our predetermined scoring heuristics to evaluate the least risky
     strategy.*)
   let all_strategies = lie_or_not ~win_cycle ~strategy:[] in
+  let thresh_strategy = lie_with_last_card ~win_cycle ~strategy:[] in
   let starting_thresh_score =
-    score_strategy
-      ~strategy:(lie_with_last_card ~win_cycle ~strategy:[])
-      ~game_state
+    score_strategy ~strategy:thresh_strategy ~game_state
   in
   let best_strategy, _ =
     List.fold
-      ~init:([], starting_thresh_score)
+      ~init:(thresh_strategy, starting_thresh_score)
       all_strategies
       ~f:(fun (strategy, score) curr_strategy ->
       let curr_score = score_strategy ~strategy:curr_strategy ~game_state in
       (* print_s[%message (strategy:Strategy.t)]; print_s[%message
          (score:float)]; *)
       (*add any other additional scoring with increased functionality*)
+      let message1 =
+        "best strat: "
+        ^ Strategy.to_string strategy
+        ^ " with score of "
+        ^ Float.to_string score
+      in
+      let message2 =
+        "curr strat: "
+        ^ Strategy.to_string curr_strategy
+        ^ " with score of "
+        ^ Float.to_string curr_score
+      in
+      print_endline message1;
+      print_endline message2;
+      print_endline "";
       if Float.( < ) curr_score score
       then (
-        let message1 =
+        (* let message1 =
           "best strat: "
           ^ Strategy.to_string strategy
           ^ " with score of "
@@ -226,7 +243,7 @@ let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
         in
         print_endline message1;
         print_endline message2;
-        print_endline "";
+        print_endline ""; *)
         curr_strategy, curr_score)
       else strategy, score)
   in
