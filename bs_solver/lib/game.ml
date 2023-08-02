@@ -158,7 +158,9 @@ let bluff_called
         (player.id : int)
         "bluff. Type false and the round will continue"];
   let any_calls = Bool.of_string (In_channel.input_line_exn stdin) in
-  match any_calls with (*bluff called when you turn and opp might call you. Dont call your own bluff*)
+  match any_calls with
+  (*bluff called when you turn and opp might call you. Dont call your own
+    bluff*)
   | true ->
     print_s
       [%message
@@ -188,7 +190,9 @@ let my_moves game =
   let win_cycle =
     Util_functions.calc_win_cycle ~me:player ~game_state:game
   in
-  let strategy = Turn_action.lie_with_last_card ~win_cycle ~strategy:[] in
+  let strategy =
+    Turn_action.evaluate_strategies ~win_cycle ~game_state:game
+  in
   print_s [%message (win_cycle : (Card.t * int) list)];
   print_s [%message (strategy : Strategy.t)];
   let count_prompt =
@@ -199,7 +203,10 @@ let my_moves game =
   let cards_put_down =
     List.init count ~f:(fun _ ->
       ( player.id
-      , Card.of_string (Stdinout.loop_card_i_put_input ~prompt:card_prompt ~game_state:game) ))
+      , Card.of_string
+          (Stdinout.loop_card_i_put_input
+             ~prompt:card_prompt
+             ~game_state:game) ))
   in
   game.pot <- cards_put_down @ game.pot;
   player.hand_size <- player.hand_size - count;

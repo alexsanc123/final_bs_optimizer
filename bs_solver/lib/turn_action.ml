@@ -43,7 +43,7 @@ let count_bluffs ~(strategy : Strategy.t) =
     if List.for_all cards_placed ~f:(fun card ->
          Card.equal card_to_provide card)
     then bluffs
-    else bluffs +  1)
+    else bluffs + 1)
 ;;
 
 let pop_tail list_to =
@@ -146,27 +146,91 @@ let rec lie_or_not
          left_children @ right_children))
 ;;
 
-let _evaluate_strategies ~(win_cycle : (Card.t * int) list) : Strategy.t =
+let score_strategy ~strategy ~(game_state : Game_state.t) : float =
+  if Strategy.equal strategy []
+  then Float.infinity
+  else (
+    let bluffs = Int.to_float (count_bluffs ~strategy) in
+    let length = Int.to_float (List.length strategy) in
+    let pot_size = List.length game_state.pot in
+    let end_on_truth =
+      let last_card_to_provide, last_cards_placed = List.last_exn strategy in
+      List.for_all last_cards_placed ~f:(fun card ->
+        Card.equal card last_card_to_provide)
+    in
+    let end_multiplier = if end_on_truth then 1.0 else 2.0 in
+    let call_density =
+      Int.to_float
+        (Hashtbl.fold
+           game_state.all_players
+           ~init:0
+           ~f:(fun ~key:id ~data:player sum_of_bluffs ->
+           if id = game_state.my_id
+           then sum_of_bluffs
+           else sum_of_bluffs + player.bluffs))
+      /. Int.to_float (Hashtbl.length game_state.all_players - 1)
+    in
+    let _, bluffs_score =
+      List.fold
+        strategy
+        ~init:(pot_size, 0.0)
+        ~f:(fun (curr_pot_size, score) move ->
+        let new_pot_size =
+          curr_pot_size + (2 * (game_state.player_count - 1))
+        in
+        if Strategy.move_is_bluff move
+        then (
+          let new_score =
+            (score +. Int.to_float curr_pot_size) *. call_density
+          in
+          new_pot_size, new_score)
+        else new_pot_size, score)
+    in
+    let score = end_multiplier *. (length +. bluffs +. bluffs_score) in
+    score)
+;;
+
+let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
+  : Strategy.t
+  =
   (*Uses our predetermined scoring heuristics to evaluate the least risky
     strategy.*)
-  let strategies =
-    [ lie_with_last_card ~win_cycle ~strategy:[]
-      (*add more functionality for different strategies here*)
-    ]
+  let all_strategies = lie_or_not ~win_cycle ~strategy:[] in
+  let starting_thresh_score =
+    score_strategy
+      ~strategy:(lie_with_last_card ~win_cycle ~strategy:[])
+      ~game_state
   in
-  let scored_strategies =
-    List.map strategies ~f:(fun strategy ->
-      let score = count_bluffs ~strategy * 2 in
+  let best_strategy, _ =
+    List.fold
+      ~init:([], starting_thresh_score)
+      all_strategies
+      ~f:(fun (strategy, score) curr_strategy ->
+      let curr_score = score_strategy ~strategy:curr_strategy ~game_state in
+      (* print_s[%message (strategy:Strategy.t)]; print_s[%message
+         (score:float)]; *)
       (*add any other additional scoring with increased functionality*)
-      strategy, score)
+      if Float.( < ) curr_score score
+      then (
+        let message1 =
+          "best strat: "
+          ^ Strategy.to_string strategy
+          ^ " with score of "
+          ^ Float.to_string score
+        in
+        let message2 =
+          "curr strat: "
+          ^ Strategy.to_string curr_strategy
+          ^ " with score of "
+          ^ Float.to_string curr_score
+        in
+        print_endline message1;
+        print_endline message2;
+        print_endline "";
+        curr_strategy, curr_score)
+      else strategy, score)
   in
-  let best_strategy =
-    List.min_elt
-      scored_strategies
-      ~compare:(fun (_, score_one) (_, score_two) ->
-      Int.compare score_one score_two)
-  in
-  match best_strategy with Some (strat, _) -> strat | _ -> []
+  best_strategy
 ;;
 
 let _act_on_strategy ~(strategy : Strategy.t) ~(card_to_provide : Card.t)

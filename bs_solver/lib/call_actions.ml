@@ -111,7 +111,7 @@ let probability_based_call
   (*actually need to implement the logic for the threshold based on how the
     game is going*)
   let probability = prob_no_lie ~game_state ~claim in
-  let message = "Probability the player is not lying: " ^ (Float.to_string (1. -. probability)) in
+  let message = "Probability the player is lying: " ^ (Float.to_string (1. -. probability)) in
   print_endline message;
   let threshold = 0.25 in
   Float.( <. ) probability threshold

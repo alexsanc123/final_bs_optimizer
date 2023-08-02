@@ -6,7 +6,7 @@ val lie_with_last_card
   -> Strategy.t
 
 val count_bluffs : strategy:Strategy.t -> int
-val _evaluate_strategies : win_cycle:(Card.t * int) list -> Strategy.t
+val evaluate_strategies : win_cycle:(Card.t * int) list -> game_state:Game_state.t-> Strategy.t
 
 val _act_on_strategy
   :  strategy:Strategy.t
