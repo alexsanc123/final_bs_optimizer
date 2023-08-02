@@ -35,16 +35,15 @@ let rec lie_with_last_card
 ;;
 
 let count_bluffs ~(strategy : Strategy.t) =
-  (*Counts bluffs*)
-  let bluffs_on_turn =
-    List.map strategy ~f:(fun (card_needed, what_to_use_list) ->
-      List.exists what_to_use_list ~f:(fun card_to_use ->
-        Card.compare card_needed card_to_use <> 0))
-  in
-  let bluffs_list =
-    List.filter bluffs_on_turn ~f:(fun bluff_or_not -> bluff_or_not)
-  in
-  List.length bluffs_list
+  (*Changed so only one pass through strategy list is needed*)
+  List.fold
+    strategy
+    ~init:0
+    ~f:(fun bluffs (card_to_provide, cards_placed) ->
+    if List.for_all cards_placed ~f:(fun card ->
+         Card.equal card_to_provide card)
+    then bluffs
+    else bluffs +  1)
 ;;
 
 let pop_tail list_to =
