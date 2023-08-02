@@ -152,12 +152,12 @@ let bluff_called
   bluff_recomendation
     ~game
     ~claim:(player.id, Game_state.card_on_turn game, num_cards_claimed);
-  print_s
-    [%message
-      "Has anyone called "
-        (player.id : int)
-        "bluff. Type false and the round will continue"];
-  let any_calls = Bool.of_string (In_channel.input_line_exn stdin) in
+  let prompt =
+    "Has anyone called "
+    ^ Int.to_string player.id
+    ^ " bluff. Type false and the round will continue"
+  in
+  let any_calls = Bool.of_string (Stdinout.loop_bool_input ~prompt) in
   match any_calls with
   (*bluff called when you turn and opp might call you. Dont call your own
     bluff*)
