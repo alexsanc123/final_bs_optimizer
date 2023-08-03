@@ -6,7 +6,7 @@ module T = struct
       id : int (* represents position in group as well *)
     ; mutable hand_size : int
     ; mutable bluffs : int
-    ; mutable cards : int Card.Table.t
+    ; mutable cards : (int * int) Card.Table.t
     ; mutable calls : int
         (*remember to initialize all ranks as 0 in hashtbl*)
     }
