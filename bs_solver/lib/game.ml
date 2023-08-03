@@ -62,8 +62,8 @@ let game_init () =
                then (52 / player_count) + 1
                else 52 / player_count)
           ; bluffs = 0
-          ; cards
           ; calls = 0
+          ; cards
           })
   in
   let game_state =
@@ -150,9 +150,11 @@ let check_bluff_called
   ~(player : Player.t)
   ~num_cards_claimed
   =
-  bluff_recomendation
-    ~game
-    ~claim:(player.id, Game_state.card_on_turn game, num_cards_claimed);
+  if not (player.id = game.my_id)
+  then
+    bluff_recomendation
+      ~game
+      ~claim:(player.id, Game_state.card_on_turn game, num_cards_claimed);
   let prompt =
     "Has anyone called "
     ^ Int.to_string player.id
@@ -176,8 +178,6 @@ let check_bluff_called
     let caller_id =
       match caller with "me" -> game.my_id | _ -> Int.of_string caller
     in
-    let caller_profile = Hashtbl.find_exn game.all_players caller_id in
-    caller_profile.calls <- caller_profile.calls + 1;
     showdown
       ~game
       ~acc:(Hashtbl.find_exn game.all_players caller_id)
