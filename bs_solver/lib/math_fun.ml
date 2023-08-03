@@ -101,13 +101,25 @@ let prob_player_has_card
   let count_of_all_hands =
     Int.to_float (choose ~n:unknown_cards ~k:hand_size)
   in
-  (* print_s [%message (count_of_winning_hands : float)]; print_s [%message
-     (count_of_all_hands : float)]; *)
+  (* print_s [%message (count_of_winning_hands : float)];
+  print_s [%message (count_of_all_hands : float)]; *)
   count_of_winning_hands /. count_of_all_hands
 ;;
 
 (*******************************************************************)
 (* Expect Tests for the math functions*)
+
+let%expect_test "Test1 for prob player has card" =
+  let result =
+    prob_player_has_card
+      ~unknown_cards:36
+      ~desired_in_unknown:4
+      ~hand_size:17
+      ~desired_to_be_winning:1
+  in
+  print_s [%message (result : float)];
+  [%expect {| (result 0.12458471760797342) |}]
+;;
 
 let%expect_test "Test1 for prob player has card" =
   let result =

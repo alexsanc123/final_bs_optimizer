@@ -9,10 +9,18 @@ let declare_player_count () =
   Int.of_string player_count
 ;;
 
-let declare_my_pos () =
+let declare_my_pos_r_dealer () =
   let prompt =
     "Please specify your seating index at the table clockwise from the 0th \
-     player (the player with the Ace of Spades): "
+     player (the player left of dealer): "
+  in
+  let my_pos = Stdinout.loop_num_input ~prompt in
+  Int.of_string my_pos
+;;
+
+let declare_ace_of_spades_pos () =
+  let prompt =
+    "Please specify the seating index of the player w the Ace of spades: "
   in
   let my_pos = Stdinout.loop_num_input ~prompt in
   Int.of_string my_pos
@@ -39,26 +47,32 @@ let declare_my_cards ~my_pos ~player_count =
   my_cards
 ;;
 
+let find_true_pos ~ace_pos ~pos ~player_count =
+  (pos - ace_pos) % player_count
+;;
+
 let game_init () =
   (*we dont know the position until the person with the ace of spades has
     acted*)
   let player_count = declare_player_count () in
-  let my_pos = declare_my_pos () in
+  let my_pos = declare_my_pos_r_dealer () in
+  let ace_pos = declare_ace_of_spades_pos () in
   let my_cards = declare_my_cards ~my_pos ~player_count in
   let all_players = Int.Table.create () in
   let _ =
     List.init player_count ~f:(fun player_id ->
-      assert (player_count > 0);
+      assert (player_count > 3);
       let cards =
         if my_pos = player_id then my_cards else My_cards.init ()
       in
+      let true_pos = find_true_pos ~pos:player_id ~ace_pos ~player_count in
       Hashtbl.set
         all_players
-        ~key:player_id
+        ~key:true_pos
         ~data:
           { Player.id = player_id
           ; hand_size =
-              (if player_id < 52 % player_count
+              (if true_pos < 52 % player_count
                then (52 / player_count) + 1
                else 52 / player_count)
           ; bluffs = 0
@@ -169,7 +183,8 @@ let showdown
   else
     List.iter rest_of_pot ~f:(fun (pot_id, card) ->
       if pot_id = game.my_id then My_cards.add_card who_lost.cards ~card);
-  Game_state.clear_cards_after_showdown game ~exclude:who_lost.id
+  Game_state.clear_cards_after_showdown game ~exclude:who_lost.id;
+  game.pot <- []
 ;;
 
 let check_bluff_called

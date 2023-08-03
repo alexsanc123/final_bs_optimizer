@@ -79,6 +79,10 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
     + num_claimed
   in
   let unknown_cards = 52 - all_known_cards in
+  (* print_s [%message (unknown_cards : int)];
+  print_s [%message (desired_in_unknown : int)];
+  print_s [%message (hand_size : int)];
+  print_s [%message (num_claimed : int)]; *)
   let probability =
     Math_fun.prob_player_has_card
       ~unknown_cards
@@ -97,7 +101,6 @@ let probability_based_call
   (*actually need to implement the logic for the threshold based on how the
     game is going*)
   let probability = prob_no_lie ~game_state ~claim in
-  print_s[%message (probability:float)];
   let prob_as_percent =
     Float.round_significant
       ~significant_digits:3
