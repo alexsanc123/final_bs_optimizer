@@ -42,7 +42,7 @@ let game_over t =
     | false ->
       (match player.hand_size = 0 with
        | true ->
-        let message = "player" ^ (Int.to_string (player_id)) ^ "won the game" in
+         let message = "player" ^ Int.to_string player_id ^ "won the game" in
          print_endline message;
          true
        | false -> false))
@@ -96,6 +96,7 @@ let test_game_state () =
                else 52 / player_count)
           ; bluffs = 0
           ; cards
+          ; calls = 0
           })
   in
   let game_state =

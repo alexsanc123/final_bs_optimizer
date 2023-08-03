@@ -63,6 +63,7 @@ let game_init () =
                else 52 / player_count)
           ; bluffs = 0
           ; cards
+          ; calls = 0
           })
   in
   let game_state =
@@ -175,6 +176,8 @@ let check_bluff_called
     let caller_id =
       match caller with "me" -> game.my_id | _ -> Int.of_string caller
     in
+    let caller_profile = Hashtbl.find_exn game.all_players caller_id in
+    caller_profile.calls <- caller_profile.calls + 1;
     showdown
       ~game
       ~acc:(Hashtbl.find_exn game.all_players caller_id)

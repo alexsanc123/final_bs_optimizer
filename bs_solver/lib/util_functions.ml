@@ -71,6 +71,7 @@ let%expect_test "Test 1 for calculating cards to provide." =
     ; hand_size = 10
     ; bluffs = 2
     ; cards = Card.Table.create ()
+    ; calls = 0
     }
   in
   let game_state =
@@ -106,6 +107,7 @@ let%expect_test "Test 2 for calculating cards to provide." =
     ; hand_size = 15
     ; bluffs = 1
     ; cards = Card.Table.create ()
+    ; calls = 0
     }
   in
   let game_state =
@@ -141,6 +143,7 @@ let%expect_test "Test 3 for calculating cards to provide." =
     ; hand_size = 12
     ; bluffs = 0
     ; cards = Card.Table.create ()
+    ; calls = 0
     }
   in
   let game_state =
