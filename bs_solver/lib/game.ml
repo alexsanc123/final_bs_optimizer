@@ -161,29 +161,29 @@ let check_bluff_called
     ^ " bluff. Type false and the round will continue"
   in
   let any_calls = Bool.of_string (Stdinout.loop_bool_input ~prompt) in
-  match any_calls with
-  (*bluff called when you turn and opp might call you. Dont call your own
-    bluff*)
-  | true ->
-    let prompt =
-      "Type in the id of the player who called the bluff or 'me' if you \
-       called bluff"
-    in
-    let caller =
-      Stdinout.loop_bluff_input
-        ~prompt
-        ~bluffer_id:player.id
-        ~my_id:game.my_id
-    in
-    let caller_id =
-      match caller with "me" -> game.my_id | _ -> Int.of_string caller
-    in
-    showdown
-      ~game
-      ~acc:(Hashtbl.find_exn game.all_players caller_id)
-      ~def:player
-      ~num_cards_claimed
-  | false -> ()
+  any_calls
+;;
+
+let bluff_called
+  ~(game : Game_state.t)
+  ~(player : Player.t)
+  ~num_cards_claimed
+  =
+  let prompt =
+    "Type in the id of the player who called the bluff or 'me' if you \
+     called bluff"
+  in
+  let caller =
+    Stdinout.loop_bluff_input ~prompt ~bluffer_id:player.id ~my_id:game.my_id
+  in
+  let caller_id =
+    match caller with "me" -> game.my_id | _ -> Int.of_string caller
+  in
+  showdown
+    ~game
+    ~acc:(Hashtbl.find_exn game.all_players caller_id)
+    ~def:player
+    ~num_cards_claimed
 ;;
 
 let my_moves game =
@@ -211,9 +211,15 @@ let my_moves game =
   in
   game.pot <- cards_put_down @ game.pot;
   player.hand_size <- player.hand_size - count;
-  check_bluff_called ~game ~player ~num_cards_claimed:count;
-  print_endline ("Cards left after move: " ^ Int.to_string player.hand_size);
-  print_endline "I made a move"
+  let any_calls =
+    check_bluff_called ~game ~player ~num_cards_claimed:count
+  in
+  match any_calls with
+  | true -> bluff_called ~game ~player ~num_cards_claimed:count
+  | false ->
+    ();
+    print_endline ("Cards left after move: " ^ Int.to_string player.hand_size);
+    print_endline "I made a move"
 ;;
 
 let opp_moves game =
@@ -232,8 +238,14 @@ let opp_moves game =
   game.pot <- added_cards @ game.pot;
   print_s [%message (game.pot : (int * Card.t) list)];
   print_endline "Opp made a move";
-  check_bluff_called ~game ~player ~num_cards_claimed;
-  print_s [%message "Cards left after move: " (player.hand_size : int)]
+  let any_calls = check_bluff_called ~game ~player ~num_cards_claimed in
+  match any_calls with
+  | true ->
+    My_cards.clear_cards ~player;
+    bluff_called ~game ~player ~num_cards_claimed
+  | false ->
+    My_cards.clear_cards ~player;
+    print_s [%message "Cards left after move: " (player.hand_size : int)]
 ;;
 
 let rec play_game ~(game : Game_state.t) =
