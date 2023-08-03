@@ -160,15 +160,16 @@ let score_strategy ~strategy ~(game_state : Game_state.t) : float =
     in
     let end_multiplier = if end_on_truth then 1.0 else 2.0 in
     let call_multiplier =
-      1.0 +. (Int.to_float
-        (Hashtbl.fold
-           game_state.all_players
-           ~init:0
-           ~f:(fun ~key:id ~data:player sum_of_bluffs ->
-           if id = game_state.my_id
-           then sum_of_bluffs
-           else sum_of_bluffs + player.bluffs))
-      /. Int.to_float (Hashtbl.length game_state.all_players - 1))
+      1.0
+      +. (Int.to_float
+            (Hashtbl.fold
+               game_state.all_players
+               ~init:0
+               ~f:(fun ~key:id ~data:player sum_of_calls ->
+               if id = game_state.my_id
+               then sum_of_calls
+               else sum_of_calls + player.calls))
+          /. Int.to_float (Hashtbl.length game_state.all_players - 1))
     in
     let _, bluffs_score =
       List.fold
@@ -228,23 +229,14 @@ let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
       print_endline message2;
       print_endline "";
       if Float.( < ) curr_score score
-      then (
-        (* let message1 =
-          "best strat: "
-          ^ Strategy.to_string strategy
-          ^ " with score of "
-          ^ Float.to_string score
-        in
-        let message2 =
-          "curr strat: "
-          ^ Strategy.to_string curr_strategy
-          ^ " with score of "
-          ^ Float.to_string curr_score
-        in
-        print_endline message1;
-        print_endline message2;
-        print_endline ""; *)
-        curr_strategy, curr_score)
+      then
+        ( (* let message1 = "best strat: " ^ Strategy.to_string strategy ^ "
+             with score of " ^ Float.to_string score in let message2 = "curr
+             strat: " ^ Strategy.to_string curr_strategy ^ " with score of "
+             ^ Float.to_string curr_score in print_endline message1;
+             print_endline message2; print_endline ""; *)
+          curr_strategy
+        , curr_score )
       else strategy, score)
   in
   best_strategy
