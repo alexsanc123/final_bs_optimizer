@@ -8,7 +8,7 @@ let conflicting_claim
   (* Assesses whether an opponent is lying based on the cards we have in our
      hand. Results in 100% probabilty the opponent is lying. *)
   let _, card, num_claimed = claim in
-  let _, qty_i_have =
+  let qty_i_have, _ =
     Hashtbl.find_exn
       (Hashtbl.find_exn game_state.all_players game_state.my_id).cards
       card
@@ -53,7 +53,7 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
         Hashtbl.fold
           player.cards
           ~init:(0, 0)
-          ~f:(fun ~key:card ~data:(_, qty) (card_sum, desired_sum) ->
+          ~f:(fun ~key:card ~data:(qty, _) (card_sum, desired_sum) ->
           let desired_sum =
             if Card.equal card card_claimed
             then desired_sum + qty
@@ -63,21 +63,15 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
       in
       player_known_cards + tot_card_sum, desired_qty + tot_desired_sum)
   in
-  let known_from_pot, desired_from_pot =
-    List.fold
-      game_state.pot
-      ~init:(0, 0)
-      ~f:(fun (known_qty, desired_qty) (player_id, card) ->
-      if player_id = game_state.my_id
-      then (
-        match Card.equal card card_claimed with
-        | true -> known_qty + 1, desired_qty + 1
-        | false -> known_qty + 1, desired_qty)
-      else known_qty, desired_qty)
-  in
+  (* let known_from_pot, desired_from_pot = List.fold game_state.pot
+     ~init:(0, 0) ~f:(fun (known_qty, desired_qty) (player_id, card) -> if
+     player_id = game_state.my_id then ( match Card.equal card card_claimed
+     with | true -> known_qty + 1, desired_qty + 1 | false -> known_qty + 1,
+     desired_qty) else known_qty, desired_qty) in let all_known_cards,
+     known_desired_qty = ( known_cards_w_players + known_from_pot ,
+     desired_cards_w_players + desired_from_pot ) in *)
   let all_known_cards, known_desired_qty =
-    ( known_cards_w_players + known_from_pot
-    , desired_cards_w_players + desired_from_pot )
+    known_cards_w_players, desired_cards_w_players
   in
   let desired_in_unknown = 4 - known_desired_qty in
   let hand_size =
@@ -103,6 +97,7 @@ let probability_based_call
   (*actually need to implement the logic for the threshold based on how the
     game is going*)
   let probability = prob_no_lie ~game_state ~claim in
+  print_s[%message (probability:float)];
   let prob_as_percent =
     Float.round_significant
       ~significant_digits:3

@@ -37,7 +37,7 @@ let card_i_put_form_checker input ~(my_player : Player.t) =
     let card = Card.of_string input in
     (match My_cards.do_i_have_enough my_player.cards ~card () with
      | true ->
-       My_cards.rm_card my_player.cards ~card ();
+       My_cards.rm_my_card my_player.cards ~card ();
        true
      | false -> false)
   | false -> false
@@ -55,7 +55,11 @@ let bool_form_checker input =
   match String.lowercase input with
   | "t" -> true
   | "true" -> true
+  | "yes" -> true
+  | "y" -> true
   | "f" -> true
+  | "no" -> true
+  | "n" -> true
   | "false" -> true
   | _ -> false
 ;;
@@ -86,7 +90,11 @@ let loop_bool_input ~prompt =
   match stdin_reprompt ~prompt ~form_checker:bool_form_checker () with
   | "t" -> "true"
   | "f" -> "false"
-  | _ -> prompt
+  | "yes" -> "true"  
+  | "no" -> "false"
+  | "y" -> "true"  
+  | "n" -> "false"
+  | answer -> answer
 ;;
 
 let loop_bluff_input ~prompt ~(bluffer_id : int) ~(my_id : int) =

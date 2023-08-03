@@ -18,6 +18,7 @@ let init () =
 ;;
 
 let do_i_have_enough t ~(card : Card.t) ?(how_much = 1) () =
+  (* does my player have enough cards for this claim*)
   let _, current = Hashtbl.find_exn t card in
   current >= how_much
 ;;
@@ -27,33 +28,63 @@ let add_card t ~(card : Card.t) =
   Hashtbl.set t ~key:card ~data:(history + 1, current + 1)
 ;;
 
-let rm_card t ~(card : Card.t) ?(how_much = 1) () =
+let rm_my_card t ~(card : Card.t) ?(how_much = 1) () =
+  (*removes card from my player*)
   let history, current = Hashtbl.find_exn t card in
   match do_i_have_enough t ~card ~how_much () with
-  | true -> Hashtbl.set t ~key:card ~data:(history, current - how_much)
+  | true ->
+    Hashtbl.set t ~key:card ~data:(history - how_much, current - how_much)
   | false -> failwith ("insufficient card count" ^ Card.to_string card)
 ;;
 
 let clear_cards ~(player : Player.t) =
   (* Processes for when a player does not recover the pot. *)
-  Hashtbl.iteri player.cards ~f:(fun ~key:card ~data:(_, current) ->
+  let table_keys = Hashtbl.keys player.cards in
+  List.iter table_keys ~f:(fun card ->
+    let _, current = Hashtbl.find_exn player.cards card in
     let new_val = if current = 0 then 0, 0 else current, current in
     Hashtbl.set player.cards ~key:card ~data:new_val)
 ;;
 
 let restore_cards ~(player : Player.t) =
-  Hashtbl.iteri player.cards ~f:(fun ~key:card ~data:(history, _) ->
+  (*restores a players hand to history if recovers pot*)
+  let table_keys = Hashtbl.keys player.cards in
+  List.iter table_keys ~f:(fun card ->
+    let history, _ = Hashtbl.find_exn player.cards card in
     Hashtbl.set player.cards ~key:card ~data:(history, history))
 ;;
 
 let update_after_move ~(player : Player.t) ~(move : Card.t * int) =
+  (*decrements current after move while keeping history*)
   let _, num_put_down = move in
-  Hashtbl.iteri player.cards ~f:(fun ~key:card ~data:(history, current) ->
-    let difference = current - num_put_down in
+  let table_keys = Hashtbl.keys player.cards in
+  List.iter table_keys ~f:(fun card ->
+    let history, current = Hashtbl.find_exn player.cards card in
+    let new_current = current - num_put_down in
     let new_val =
-      if difference < 0 then history, 0 else history, difference
+      if new_current < 0 then history, 0 else history, new_current
     in
     Hashtbl.set player.cards ~key:card ~data:new_val)
+;;
+
+let to_string t =
+  Hashtbl.fold
+    t
+    ~init:""
+    ~f:(fun ~key:card ~data:(history, current) built_string ->
+    let card_str = Card.to_string card in
+    let his_str = Int.to_string history in
+    let cur_str = Int.to_string current in
+    match history, current with
+    | 0, 0 -> built_string
+    | _, _ ->
+      built_string
+      ^ card_str
+      ^ " - (h: "
+      ^ his_str
+      ^ ", c: "
+      ^ cur_str
+      ^ ") ")
 ;;
 
 (* include Hashable.Make (T) include

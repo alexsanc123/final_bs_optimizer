@@ -59,7 +59,16 @@ let whos_turn t =
   Hashtbl.find_exn t.all_players player_id
 ;;
 
-let test_game_state () =
+let clear_cards_after_showdown t ~(exclude : int) =
+  (*clears all cards after showdown except my player and the id of the player
+    id of the exclude*)
+  Hashtbl.iteri t.all_players ~f:(fun ~key:player_id ~data:player ->
+    if player_id = t.my_id || player_id = exclude
+    then ()
+    else My_cards.clear_cards ~player)
+;;
+
+(* let test_game_state () =
   (*we dont know the position until the person with the ace of spades has
     acted*)
   let player_count = 5 in
@@ -78,6 +87,63 @@ let test_game_state () =
     ; Card.Three
     ; Card.Five
     ]
+  
+    ~f:(fun card -> My_cards.add_card my_cards ~card);
+  let all_players = Int.Table.create () in
+  let _ =
+    List.init player_count ~f:(fun player_id ->
+      let cards =
+        if my_pos = player_id then my_cards else My_cards.init ()
+      in
+      Hashtbl.set
+        all_players
+        ~key:player_id
+        ~data:
+          { Player.id = player_id
+          ; hand_size =
+              (if player_id < 52 % player_count
+               then (52 / player_count) + 1
+               else 52 / player_count)
+          ; bluffs = 0
+          ; cards
+          ; calls = 0
+          })
+  in
+  let game_state =
+    { round_num = 0; player_count; pot = []; all_players; my_id = my_pos }
+  in
+  print_s
+    [%message (Hashtbl.find_exn game_state.all_players my_pos : Player.t)];
+  game_state
+;; *)
+
+let test_game_state () =
+  (*we dont know the position until the person with the ace of spades has
+    acted*)
+  let player_count = 3 in
+  let my_pos = 0 in
+  let my_cards = My_cards.init () in
+  List.iter
+    [ Card.Four
+    ; Card.Nine
+    ; Card.Five
+    ; Card.Four
+    ; Card.Three
+    ; Card.Six
+    ; Card.Seven
+    ; Card.Three
+    ; Card.King
+    ; Card.Jack
+    ; Card.Nine
+    ; Card.Ace
+    ; Card.Ace
+    ; Card.Seven
+    ; Card.Queen
+    ; Card.Ten
+    ; Card.Ten
+    ; Card.Jack
+    ]
+  
     ~f:(fun card -> My_cards.add_card my_cards ~card);
   let all_players = Int.Table.create () in
   let _ =
