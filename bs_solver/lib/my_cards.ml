@@ -18,6 +18,7 @@ let init () =
 ;;
 
 let do_i_have_enough t ~(card : Card.t) ?(how_much = 1) () =
+  (* Ensures a card claim can be valid based on my current hand. *)
   let _, current = Hashtbl.find_exn t card in
   current >= how_much
 ;;
@@ -42,6 +43,8 @@ let clear_cards ~(player : Player.t) =
 ;;
 
 let restore_cards ~(player : Player.t) =
+  (* In the event a player recovered a pot they contributed to, restores all
+     of the cards we knew about*)
   Hashtbl.iteri player.cards ~f:(fun ~key:card ~data:(history, _) ->
     Hashtbl.set player.cards ~key:card ~data:(history, history))
 ;;

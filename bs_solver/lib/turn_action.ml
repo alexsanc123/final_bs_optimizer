@@ -6,6 +6,8 @@ let rec lie_with_last_card
   ~(strategy : Strategy.t)
   : Strategy.t
   =
+  (* Looks at our future win cycle, to fill needed cards with least imporant
+     cards. *)
   match win_cycle with
   | [] -> strategy
   | _ ->
@@ -35,7 +37,7 @@ let rec lie_with_last_card
 ;;
 
 let count_bluffs ~(strategy : Strategy.t) =
-  (*Changed so only one pass through strategy list is needed*)
+  (* Quantifies the number of bluffs a strategy executes. *)
   List.fold
     strategy
     ~init:0
@@ -47,11 +49,13 @@ let count_bluffs ~(strategy : Strategy.t) =
 ;;
 
 let pop_tail list_to =
+  (* Returns the list without its last element and the last element *)
   let beg_list, _ = List.split_n list_to (List.length list_to - 1) in
   List.last_exn list_to, beg_list
 ;;
 
 let pop_head list_to =
+  (* Returns the list without its first element and the first element *)
   let _, tl_list = List.split_n list_to 1 in
   List.hd_exn list_to, tl_list
 ;;
@@ -60,6 +64,7 @@ let change_existing_strat
   ~(strategy : Strategy.t)
   ~(update : Card.t * Card.t list)
   =
+  (* Changes the last move in an existing strategy *)
   let _, cards_put = update in
   let tl_strat, beg_strat = pop_tail strategy in
   let tl_card_claimed, tl_cards_put = tl_strat in
@@ -147,6 +152,7 @@ let rec lie_or_not
 ;;
 
 let score_strategy ~strategy ~(game_state : Game_state.t) : float =
+  (* Uses heuristics to evaluate the risk associated with a strategy. *)
   if Strategy.equal strategy []
   then Float.infinity
   else (

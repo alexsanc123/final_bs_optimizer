@@ -15,6 +15,8 @@ include T
 include Sexpable.To_stringable (T)
 
 let card_on_turn t =
+  (* Uses a game state's round number to calculate the card needed to to
+     provide. *)
   match (t.round_num + 1) % 13 with
   | 1 -> (Ace : Card.t)
   | 2 -> Two
@@ -33,6 +35,8 @@ let card_on_turn t =
 ;;
 
 let game_over t =
+  (* Assess all of the player's hand size's to see if the game has been
+     won. *)
   Hashtbl.fold
     t.all_players
     ~init:false
@@ -49,16 +53,19 @@ let game_over t =
 ;;
 
 let is_my_turn t =
+  (* Returns whether or not it is our turn.*)
   (* we should actually start round on 0*)
   if t.round_num % t.player_count = t.my_id then true else false
 ;;
 
 let whos_turn t =
+  (* Returns the id of the player prompted to place cards. *)
   let player_id = t.round_num % t.player_count in
   (* print_s [%message "Its player" (player_id : int) "turn"]; *)
   Hashtbl.find_exn t.all_players player_id
 ;;
 
+(* Test for the game_state to be able to play in dune/exec *)
 let test_game_state () =
   (*we dont know the position until the person with the ace of spades has
     acted*)

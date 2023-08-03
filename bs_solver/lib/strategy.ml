@@ -8,14 +8,15 @@ include T
 include Sexpable.To_stringable (T)
 
 let move_is_bluff (move : Card.t * Card.t list) : bool =
-  (*add test case*)
+  (* Indicates whether there is a difference in cards put down and the card
+     required to put down. *)
   let card_to_provide, cards_to_use = move in
   not
     (List.for_all cards_to_use ~f:(fun card ->
        Card.equal card card_to_provide))
 ;;
 
-(* Expect tests *)
+(* Expect tests for move is bluff. *)
 
 let%expect_test "Test 1 for evaluating if a move is a bluff." =
   let move =
