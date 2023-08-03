@@ -5,6 +5,7 @@ type t =
   ; mutable hand_size : int
   ; mutable bluffs : int
   ; mutable cards : int Card.Table.t
+  ; mutable calls : int
   }
 [@@deriving sexp, fields]
 
