@@ -49,7 +49,8 @@ let calc_win_cycle ~(me : Player.t) ~(game_state : Game_state.t) =
       let rank =
         card_on_turn (current_turn + (game_state.player_count * cycle_count))
       in
-      rank, Hashtbl.find_exn me.cards rank)
+      let _, current = Hashtbl.find_exn me.cards rank in
+      rank, current)
   in
   chop_win_seq full_cycle
 ;;

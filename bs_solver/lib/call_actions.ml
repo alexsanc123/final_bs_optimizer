@@ -5,31 +5,22 @@ let conflicting_claim
   ~(game_state : Game_state.t)
   ~(claim : int * Card.t * int)
   =
-  (*Assesses whether an opponent is lying based on the cards we have in our
-    hand.*)
+  (* Assesses whether an opponent is lying based on the cards we have in our
+     hand. Results in 100% probabilty the opponent is lying. *)
   let _, card, num_claimed = claim in
-  let my_profile =
-    Hashtbl.find_exn game_state.all_players game_state.my_id
+  let _, qty_i_have =
+    Hashtbl.find_exn
+      (Hashtbl.find_exn game_state.all_players game_state.my_id).cards
+      card
   in
-  let how_many_i_have = Hashtbl.find_exn my_profile.cards card in
-  let available_cards = 4 - how_many_i_have in
+  let available_cards = 4 - qty_i_have in
   available_cards < num_claimed
 ;;
 
-(* let check_opponent_win ~(game_state : Game_state.t) ~(claim : int * Card.t
-   * int) = (*If an opponent's claim on their turn allows them to win the
-   game, call bluff (GAME WOULD BE OVER IF THEY SUCCEEDED...) )*) (*assumes
-   players hand has already been decremented*) let opponent_id =
-   game_state.round_num % game_state.player_count in let opponent_profile =
-   Hashtbl.find_exn game_state.all_players opponent_id in let
-   opponent_hand_size = opponent_profile.hand_size in let _, _, num_claimed =
-   claim in num_claimed - opponent_hand_size = 0 ;; *)
-
 let useful_call ~(game_state : Game_state.t) ~(claim : int * Card.t * int) =
-  (*Assesses if calling a bluff would be incentivized regardlesss of the
-    outcome, due to the claimed card being in the near future of our win
-    cycle. ** Hardcoded threshold of "small pot" being 5 cards or less and
-    "immediatley needed card" being within 4 win cycles.** *)
+  (* Assesses if calling a bluff would be incentivized regardlesss of the
+     outcome, due to the claimed card being in the near future of our win
+     cycle. *)
   let _, card_claimed, _ = claim in
   if List.length game_state.pot <= 5
   then (
@@ -50,8 +41,8 @@ let useful_call ~(game_state : Game_state.t) ~(claim : int * Card.t * int) =
 let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
   : float
   =
-  (*Relies on pure odds to assess whether or not we should call a bluff or
-    not. Should return a bool! *)
+  (* Relies on choose function to assess the probability of an opponent's
+     claim being the complete truth. *)
   let who_claimed, card_claimed, num_claimed = claim in
   let known_cards_w_players, desired_cards_w_players =
     Hashtbl.fold
@@ -62,7 +53,7 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
         Hashtbl.fold
           player.cards
           ~init:(0, 0)
-          ~f:(fun ~key:card ~data:qty (card_sum, desired_sum) ->
+          ~f:(fun ~key:card ~data:(_, qty) (card_sum, desired_sum) ->
           let desired_sum =
             if Card.equal card card_claimed
             then desired_sum + qty
@@ -108,10 +99,20 @@ let probability_based_call
   ~(game_state : Game_state.t)
   ~(claim : int * Card.t * int)
   =
+  (*a*)
   (*actually need to implement the logic for the threshold based on how the
     game is going*)
   let probability = prob_no_lie ~game_state ~claim in
-  let message = "Probability the player is lying: " ^ (Float.to_string (1. -. probability)) in
+  let prob_as_percent =
+    Float.round_significant
+      ~significant_digits:3
+      ((1. -. probability) *. 100.0)
+  in
+  let message =
+    "Probability the player is lying: "
+    ^ Float.to_string prob_as_percent
+    ^ "%"
+  in
   print_endline message;
   let threshold = 0.25 in
   Float.( <. ) probability threshold
@@ -138,3 +139,12 @@ let assess_calling_bluff
   then true
   else probability_based_call ~game_state ~claim
 ;;
+
+(* let check_opponent_win ~(game_state : Game_state.t) ~(claim : int * Card.t
+   * int) = (*If an opponent's claim on their turn allows them to win the
+   game, call bluff (GAME WOULD BE OVER IF THEY SUCCEEDED...) )*) (*assumes
+   players hand has already been decremented*) let opponent_id =
+   game_state.round_num % game_state.player_count in let opponent_profile =
+   Hashtbl.find_exn game_state.all_players opponent_id in let
+   opponent_hand_size = opponent_profile.hand_size in let _, _, num_claimed =
+   claim in num_claimed - opponent_hand_size = 0 ;; *)

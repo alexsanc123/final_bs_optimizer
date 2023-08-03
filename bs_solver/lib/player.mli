@@ -4,7 +4,7 @@ type t =
   { id : int
   ; mutable hand_size : int
   ; mutable bluffs : int
-  ; mutable cards : int Card.Table.t
+  ; mutable cards : (int * int) Card.Table.t
   ; mutable calls : int
   }
 [@@deriving sexp, fields]
