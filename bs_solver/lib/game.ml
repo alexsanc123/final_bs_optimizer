@@ -149,38 +149,41 @@ let check_bluff_called
   ~(player : Player.t)
   ~num_cards_claimed
   =
-  bluff_recomendation
-    ~game
-    ~claim:(player.id, Game_state.card_on_turn game, num_cards_claimed);
-  let prompt =
-    "Has anyone called "
-    ^ Int.to_string player.id
-    ^ " bluff. Type false and the round will continue"
-  in
-  let any_calls = Bool.of_string (Stdinout.loop_bool_input ~prompt) in
-  match any_calls with
-  (*bluff called when you turn and opp might call you. Dont call your own
-    bluff*)
-  | true ->
-    let prompt =
-      "Type in the id of the player who called the bluff or 'me' if you \
-       called bluff"
-    in
-    let caller =
-      Stdinout.loop_bluff_input
-        ~prompt
-        ~bluffer_id:player.id
-        ~my_id:game.my_id
-    in
-    let caller_id =
-      match caller with "me" -> game.my_id | _ -> Int.of_string caller
-    in
-    showdown
+  if not (player.id = game.my_id)
+  then
+    bluff_recomendation
       ~game
-      ~acc:(Hashtbl.find_exn game.all_players caller_id)
-      ~def:player
-      ~num_cards_claimed
-  | false -> ()
+      ~claim:(player.id, Game_state.card_on_turn game, num_cards_claimed)
+  else (
+    let prompt =
+      "Has anyone called "
+      ^ Int.to_string player.id
+      ^ " bluff. Type false and the round will continue"
+    in
+    let any_calls = Bool.of_string (Stdinout.loop_bool_input ~prompt) in
+    match any_calls with
+    (*bluff called when you turn and opp might call you. Dont call your own
+      bluff*)
+    | true ->
+      let prompt =
+        "Type in the id of the player who called the bluff or 'me' if you \
+         called bluff"
+      in
+      let caller =
+        Stdinout.loop_bluff_input
+          ~prompt
+          ~bluffer_id:player.id
+          ~my_id:game.my_id
+      in
+      let caller_id =
+        match caller with "me" -> game.my_id | _ -> Int.of_string caller
+      in
+      showdown
+        ~game
+        ~acc:(Hashtbl.find_exn game.all_players caller_id)
+        ~def:player
+        ~num_cards_claimed
+    | false -> ())
 ;;
 
 let my_moves game =
