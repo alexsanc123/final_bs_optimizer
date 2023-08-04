@@ -36,7 +36,7 @@ let chop_win_seq sequence : (Card.t * int) list =
 let my_next_turn ~(me : Player.t) ~(game_state : Game_state.t) =
   ((game_state.round_num / game_state.player_count * game_state.player_count)
    + me.id)
-  % game_state.player_count
+  (* % game_state.player_count *)
 ;;
 
 let calc_win_cycle ~(me : Player.t) ~(game_state : Game_state.t) =

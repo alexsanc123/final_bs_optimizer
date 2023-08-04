@@ -53,14 +53,7 @@ let num_form_checker input =
 
 let bool_form_checker input =
   match String.lowercase input with
-  | "t" -> true
-  | "true" -> true
-  | "yes" -> true
-  | "y" -> true
-  | "f" -> true
-  | "no" -> true
-  | "n" -> true
-  | "false" -> true
+  | "t" | "true" | "yes" | "y" | "f" | "no" | "n" | "false" -> true
   | _ -> false
 ;;
 
@@ -88,12 +81,8 @@ let loop_card_i_put_input ~prompt ~(game_state : Game_state.t) =
 
 let loop_bool_input ~prompt =
   match stdin_reprompt ~prompt ~form_checker:bool_form_checker () with
-  | "t" -> "true"
-  | "f" -> "false"
-  | "yes" -> "true"
-  | "no" -> "false"
-  | "y" -> "true"
-  | "n" -> "false"
+  | "t" | "yes" | "y" -> "true"
+  | "f" | "no" | "n" -> "false"
   | answer -> answer
 ;;
 
