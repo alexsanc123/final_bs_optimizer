@@ -38,10 +38,7 @@ let my_next_turn ~(me : Player.t) ~(game_state : Game_state.t) =
   + me.id
 ;;
 
-(* % game_state.player_count *)
-
 let calc_win_cycle ~(me : Player.t) ~(game_state : Game_state.t) =
-  (* id should start at 0 if round starts at 1 *)
   (*Calculates the list of the cards we need to provide according to the
     cards we have in our hand.*)
   let current_turn = my_next_turn ~me ~game_state in

@@ -79,6 +79,3 @@ let to_string t =
         "%{built_string}%{card#Card} - (h: %{history#Int}, c: \
          %{current#Int}), "])
 ;;
-
-(* include Hashable.Make (T) include
-   Hashable.Make_plain_and_derive_hash_fold_t (T) *)

@@ -124,6 +124,12 @@ Showdown
     {|Please specify the Rank of the card you received
 e.g. 2 - representing the Two|}
   in
+  let players_not_in_pot =
+    List.filter_map (Hashtbl.keys game.all_players) ~f:(fun id ->
+      if List.exists game.pot ~f:(fun (pot_id, _) -> id = pot_id)
+      then None
+      else Some id)
+  in
   let card_on_turn = Game_state.card_on_turn game in
   let claimed_of_pot, rest_of_pot =
     List.split_n game.pot num_cards_claimed
@@ -187,7 +193,9 @@ e.g. 2 - representing the Two|}
   else
     List.iter rest_of_pot ~f:(fun (pot_id, card) ->
       if pot_id = game.my_id then My_cards.add_card who_lost.cards ~card);
-  Game_state.clear_cards_after_showdown game ~exclude:who_lost.id;
+  Game_state.clear_cards_after_showdown
+    game
+    ~exclude:(players_not_in_pot @ [ who_lost.id ]);
   game.pot <- []
 ;;
 
@@ -284,7 +292,6 @@ let opp_moves game =
     List.init num_cards_claimed ~f:(fun _ -> player.id, card)
   in
   game.pot <- added_cards @ game.pot;
-  (* print_s [%message (game.pot : (int * Card.t) list)]; *)
   print_endline "\nOpponent made their move. ";
   let any_calls = check_bluff_called ~game ~player ~num_cards_claimed in
   match any_calls with
