@@ -107,7 +107,7 @@ let bluff_recomendation ~game ~claim =
   let message = "Should I Call: " ^ Bool.to_string should_i_call in
   print_endline message;
   print_endline
-  "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
+    "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
 ;;
 
 let showdown
@@ -117,11 +117,10 @@ let showdown
   ~num_cards_claimed
   =
   print_endline
-  "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
-
+    "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
   print_endline "Showdown";
   print_endline
-  "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
+    "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
   let prompt =
     "Please specify the Rank of the card revealed e.g. 2 - representing the \
      Two"
@@ -328,6 +327,7 @@ let rec play_game ~(game : Game_state.t) =
     in
     game.round_num <- game.round_num + 1;
     print_endline ("Cards left after move: " ^ Int.to_string player.hand_size);
-    print_endline ("The pot has size of: " ^ Int.to_string (List.length game.pot));
+    print_endline
+      ("The pot has size of: " ^ Int.to_string (List.length game.pot));
     play_game ~game
 ;;
