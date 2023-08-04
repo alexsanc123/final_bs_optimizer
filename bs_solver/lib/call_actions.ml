@@ -120,8 +120,10 @@ let probability_based_call
      in let threshold = Int.to_float (pot_size * 3) /. (aggression *.
      Int.to_float player_bluffs) in print_endline ("Probability threshold is:
      " ^ Float.to_string threshold);) *)
-  let threshold = 75.0 in
-  Float.( >. ) prob_of_lie threshold
+  (* (let strategy_without_lies = List.for_all strategy ~f:(fun move -> not
+     (Strategy.move_is_bluff move)) in let threshold = if
+     strategy_without_lies then 100.0 else 75.0 in) *)
+  Float.( >. ) prob_of_lie 75.0
 ;;
 
 let assess_calling_bluff
