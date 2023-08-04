@@ -1,5 +1,5 @@
 open! Core
-open Util_functions
+open! Util_functions
 
 let conflicting_claim
   ~(game_state : Game_state.t)
@@ -97,18 +97,30 @@ let probability_based_call
   (* given the probability an opponent is telling the complete truth, output
      the probability that they are lying, calculate an appropriate threshold
      to call, & reccomend to call or not. *)
+  let _who_claimed, _card_claied, _num_claimed = claim in
   let probability = prob_no_lie ~game_state ~claim in
-  let prob_as_percent =
+  let prob_of_lie =
     Float.round_significant
       ~significant_digits:3
       ((1. -. probability) *. 100.0)
   in
   print_endline
-    ("Probability the player is lying: "
-     ^ Float.to_string prob_as_percent
-     ^ "%");
-  let threshold = 0.25 in
-  Float.( <. ) probability threshold
+    ("Probability the player is lying: " ^ Float.to_string prob_of_lie ^ "%");
+  (*let player_bluffs = (Hashtbl.find_exn game_state.all_players
+    who_claimed).bluffs in let pot_size = List.length game_state.pot in
+
+    let my_hand_size = (Hashtbl.find_exn game_state.all_players
+    game_state.my_id).hand_size in let num_smaller_hand_sizes = List.init
+    game_state.player_count ~f:(fun id -> (Hashtbl.find_exn
+    game_state.all_players id).hand_size ) |> List.filter ~f:(fun size ->
+    size < my_hand_size) |> List.length in let percent_opps_winning =
+    (num_smaller_hand_sizes // game_state.player_count) *. 100.0 in let
+    aggression = if Float.(>.) percent_opps_winning 75.0 then true else
+
+    let threshold = (
+
+    0.0) in *)
+  Float.( >. ) prob_of_lie 75.0
 ;;
 
 let assess_calling_bluff

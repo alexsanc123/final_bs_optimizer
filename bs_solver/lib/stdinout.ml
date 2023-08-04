@@ -86,7 +86,7 @@ let loop_bool_input ~prompt =
   match stdin_reprompt ~prompt ~form_checker:bool_form_checker () with
   | "t" -> "true"
   | "f" -> "false"
-  | _ -> prompt
+  | output -> output
 ;;
 
 let loop_bluff_input ~prompt ~(bluffer_id : int) ~(my_id : int) =
