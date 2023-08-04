@@ -72,19 +72,12 @@ let to_string t =
     t
     ~init:""
     ~f:(fun ~key:card ~data:(history, current) built_string ->
-      let card_str = Card.to_string card in
-      let his_str = Int.to_string history in
-      let cur_str = Int.to_string current in
-      match history, current with
-      | 0, 0 -> built_string
-      | _, _ ->
-        built_string
-        ^ card_str
-        ^ " - (h: "
-        ^ his_str
-        ^ ", c: "
-        ^ cur_str
-        ^ ") ")
+    match history, current with
+    | 0, 0 -> built_string
+    | _, _ ->
+      [%string
+        "%{built_string}%{card#Card} - (h: %{history#Int}, c: \
+         %{current#Int})"])
 ;;
 
 (* include Hashable.Make (T) include
