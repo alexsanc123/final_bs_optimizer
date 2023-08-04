@@ -83,7 +83,7 @@ let test_game_state () =
     ; Card.Ace
     ; Card.Two
     ; Card.Four
-    ; Card.Eight
+    ; Card.Six
     ; Card.Ten
     ; Card.Queen
     ; Card.Six
