@@ -49,19 +49,19 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
       game_state.all_players
       ~init:(0, 0)
       ~f:(fun ~key:_ ~data:player (tot_card_sum, tot_desired_sum) ->
-      let player_known_cards, desired_qty =
-        Hashtbl.fold
-          player.cards
-          ~init:(0, 0)
-          ~f:(fun ~key:card ~data:(qty, _) (card_sum, desired_sum) ->
-          let desired_sum =
-            if Card.equal card card_claimed
-            then desired_sum + qty
-            else desired_sum
-          in
-          card_sum + qty, desired_sum)
-      in
-      player_known_cards + tot_card_sum, desired_qty + tot_desired_sum)
+        let player_known_cards, desired_qty =
+          Hashtbl.fold
+            player.cards
+            ~init:(0, 0)
+            ~f:(fun ~key:card ~data:(qty, _) (card_sum, desired_sum) ->
+              let desired_sum =
+                if Card.equal card card_claimed
+                then desired_sum + qty
+                else desired_sum
+              in
+              card_sum + qty, desired_sum)
+        in
+        player_known_cards + tot_card_sum, desired_qty + tot_desired_sum)
   in
   (* let known_from_pot, desired_from_pot = List.fold game_state.pot
      ~init:(0, 0) ~f:(fun (known_qty, desired_qty) (player_id, card) -> if
@@ -79,10 +79,9 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
     + num_claimed
   in
   let unknown_cards = 52 - all_known_cards in
-  (* print_s [%message (unknown_cards : int)];
-  print_s [%message (desired_in_unknown : int)];
-  print_s [%message (hand_size : int)];
-  print_s [%message (num_claimed : int)]; *)
+  (* print_s [%message (unknown_cards : int)]; print_s [%message
+     (desired_in_unknown : int)]; print_s [%message (hand_size : int)];
+     print_s [%message (num_claimed : int)]; *)
   let probability =
     Math_fun.prob_player_has_card
       ~unknown_cards

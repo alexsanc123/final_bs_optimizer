@@ -5,10 +5,8 @@ val conflicting_claim
   -> claim:int * Card.t * int
   -> bool
 
-(* val check_opponent_win
-  :  game_state:Game_state.t
-  -> claim:int * Card.t * int
-  -> bool *)
+(* val check_opponent_win : game_state:Game_state.t -> claim:int * Card.t *
+   int -> bool *)
 
 val useful_call : game_state:Game_state.t -> claim:int * Card.t * int -> bool
 

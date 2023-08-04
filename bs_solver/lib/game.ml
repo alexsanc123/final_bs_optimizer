@@ -70,9 +70,9 @@ let game_init () =
         all_players
         ~key:true_pos
         ~data:
-          { Player.id = player_id
+          { Player.id = true_pos
           ; hand_size =
-              (if true_pos < 52 % player_count
+              (if my_pos < 52 % player_count
                then (52 / player_count) + 1
                else 52 / player_count)
           ; bluffs = 0
@@ -85,7 +85,7 @@ let game_init () =
     ; player_count
     ; pot = []
     ; all_players
-    ; my_id = my_pos
+    ; my_id = find_true_pos ~pos:my_pos ~ace_pos ~player_count
     }
   in
   (* print_s [%message (game_state : Game_state.t)]; *)
@@ -126,13 +126,18 @@ let showdown
      Two"
   in
   let card_on_turn = Game_state.card_on_turn game in
-  let _, rest_of_pot = List.split_n game.pot num_cards_claimed in
+  let claimed_of_pot, rest_of_pot =
+    List.split_n game.pot num_cards_claimed
+  in
   (* print_s [%message (rest_of_pot : (int * Card.t) list)]; *)
   let revealed_cards =
-    List.init num_cards_claimed ~f:(fun _ ->
-      let card_input_string = Stdinout.loop_card_input ~prompt in
-      let card = Card.of_string card_input_string in
-      card)
+    if def.id = game.my_id
+    then List.map claimed_of_pot ~f:(fun (_, card) -> card)
+    else
+      List.init num_cards_claimed ~f:(fun _ ->
+        let card_input_string = Stdinout.loop_card_input ~prompt in
+        let card = Card.of_string card_input_string in
+        card)
   in
   let who_lost =
     if List.for_all revealed_cards ~f:(fun card ->
@@ -289,7 +294,10 @@ let opp_moves game =
 ;;
 
 let rec play_game ~(game : Game_state.t) =
-  print_endline "------------------------------------------------------";
+  print_endline
+    "------------------------------------------------------------------------------";
+  print_endline
+    "------------------------------------------------------------------------------";
   let player = Game_state.whos_turn game in
   let card_on_turn = Game_state.card_on_turn game in
   match Game_state.game_over game with

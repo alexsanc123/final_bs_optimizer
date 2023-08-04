@@ -12,5 +12,3 @@ val clear_cards : player:Player.t -> unit
 val restore_cards : player:Player.t -> unit
 val update_after_move : player:Player.t -> move:Card.t * int -> unit
 val to_string : t -> string
-
-

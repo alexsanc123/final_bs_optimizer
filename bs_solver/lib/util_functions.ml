@@ -26,9 +26,9 @@ let chop_win_seq sequence : (Card.t * int) list =
       sequence
       ~init:([], [])
       ~f:(fun (built, pending) (rank, count) ->
-      match count with
-      | 0 -> built, pending @ [ rank, count ]
-      | _ -> built @ pending @ [ rank, count ], [])
+        match count with
+        | 0 -> built, pending @ [ rank, count ]
+        | _ -> built @ pending @ [ rank, count ], [])
   in
   seq
 ;;

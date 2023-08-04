@@ -101,8 +101,8 @@ let prob_player_has_card
   let count_of_all_hands =
     Int.to_float (choose ~n:unknown_cards ~k:hand_size)
   in
-  (* print_s [%message (count_of_winning_hands : float)];
-  print_s [%message (count_of_all_hands : float)]; *)
+  (* print_s [%message (count_of_winning_hands : float)]; print_s [%message
+     (count_of_all_hands : float)]; *)
   count_of_winning_hands /. count_of_all_hands
 ;;
 

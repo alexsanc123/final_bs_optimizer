@@ -67,7 +67,7 @@ let bool_form_checker input =
 let bluff_form_checker input ~(bluffer_id : int) ~(my_id : int) =
   if String.equal "me" input
   then not (bluffer_id = my_id)
-  else num_form_checker input && (bluffer_id <> Int.of_string input)
+  else num_form_checker input && bluffer_id <> Int.of_string input
 ;;
 
 let loop_card_input ~prompt =
@@ -90,9 +90,9 @@ let loop_bool_input ~prompt =
   match stdin_reprompt ~prompt ~form_checker:bool_form_checker () with
   | "t" -> "true"
   | "f" -> "false"
-  | "yes" -> "true"  
+  | "yes" -> "true"
   | "no" -> "false"
-  | "y" -> "true"  
+  | "y" -> "true"
   | "n" -> "false"
   | answer -> answer
 ;;
