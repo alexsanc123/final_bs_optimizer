@@ -112,6 +112,18 @@ let prob_player_has_card
 let%expect_test "Test1 for prob player has card" =
   let result =
     prob_player_has_card
+      ~unknown_cards:36
+      ~desired_in_unknown:4
+      ~hand_size:17
+      ~desired_to_be_winning:1
+  in
+  print_s [%message (result : float)];
+  [%expect {| (result 0.12458471760797342) |}]
+;;
+
+let%expect_test "Test1 for prob player has card" =
+  let result =
+    prob_player_has_card
       ~unknown_cards:44
       ~desired_in_unknown:3
       ~hand_size:10
