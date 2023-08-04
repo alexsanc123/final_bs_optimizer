@@ -1,23 +1,16 @@
 import logo from './logo.svg';
 import './App.css';
+import Card from 'react-playing-card'
+
 
 function App() {
+
+  let ranks = ["A"]
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          BS optimizer by Justin and Alex
-        </a>
-      </header>
+      <h1> BS optimizer by Justin and Alex </h1>
+      <Card rank="A" suit="S"/>
     </div>
   );
 }
