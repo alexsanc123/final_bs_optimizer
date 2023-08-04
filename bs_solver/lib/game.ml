@@ -2,7 +2,7 @@ open! Core
 open! In_channel
 
 let declare_player_count () =
-  let prompt = "Please specify how many players are in the round " in
+  let prompt = "\nPlease specify how many players are in the round " in
   let player_count = Stdinout.loop_num_input ~prompt in
   (* print_endline "Please specify how many players are in the round "; let
      player_count = In_channel.input_line_exn stdin in *)
@@ -20,7 +20,8 @@ let declare_my_pos_r_dealer () =
 
 let declare_ace_of_spades_pos () =
   let prompt =
-    "Please specify the seating index of the player w the Ace of spades: "
+    "Please specify the seating index of the player with the Ace of spades \
+     (with respect to the dealer): "
   in
   let my_pos = Stdinout.loop_num_input ~prompt in
   Int.of_string my_pos
@@ -35,8 +36,8 @@ let declare_my_cards ~my_pos ~player_count =
   (* print_s[%message (hand_size:int)]; *)
   let my_cards = My_cards.init () in
   let prompt =
-    "Please specify the Rank of the  card you received\n\
-    \         e.g. 2 - representing the Two"
+    {|Please specify the Rank of the card you received
+e.g. 2 - representing the Two|}
   in
   let _ =
     List.init hand_size ~f:(fun _ ->
@@ -99,13 +100,12 @@ let end_processes game =
 
 let bluff_recomendation ~game ~claim =
   print_endline
-    "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
-  print_endline "Recommendation";
+    {|*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Reccomendation: |};
   let should_i_call =
     Call_actions.assess_calling_bluff ~game_state:game ~claim
   in
-  let message = "Should I Call: " ^ Bool.to_string should_i_call in
-  print_endline message;
+  print_endline ("Should I Call: " ^ Bool.to_string should_i_call);
   print_endline
     "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
 ;;
@@ -117,13 +117,12 @@ let showdown
   ~num_cards_claimed
   =
   print_endline
-    "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
-  print_endline "Showdown";
-  print_endline
-    "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*";
+    {|*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Showdown
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*|};
   let prompt =
-    "Please specify the Rank of the card revealed e.g. 2 - representing the \
-     Two"
+    {|Please specify the Rank of the card you received
+e.g. 2 - representing the Two|}
   in
   let card_on_turn = Game_state.card_on_turn game in
   let claimed_of_pot, rest_of_pot =
@@ -205,7 +204,7 @@ let check_bluff_called
   let prompt =
     "Has anyone called Player "
     ^ Int.to_string player.id
-    ^ "'s bluff. Type false and the round will continue"
+    ^ "'s bluff? Type false and the round will continue"
   in
   let any_calls = Bool.of_string (Stdinout.loop_bool_input ~prompt) in
   any_calls
@@ -244,9 +243,12 @@ let my_moves game =
   print_s [%message (win_cycle : (Card.t * int) list)];
   print_s [%message (strategy : Strategy.t)];
   let count_prompt =
-    "Please specify the num of cards you would like to put down on your turn"
+    "Please specify the number of cards you would like to put down on your \
+     turn"
   in
-  let card_prompt = "please specify the card you would like to put down" in
+  let card_prompt =
+    "Please specify the card rank you would like to put down"
+  in
   let count = Int.of_string (Stdinout.loop_num_input ~prompt:count_prompt) in
   let cards_put_down =
     List.init count ~f:(fun _ ->
@@ -265,7 +267,7 @@ let my_moves game =
   | true -> bluff_called ~game ~player ~num_cards_claimed:count
   | false ->
     ();
-    print_endline "I made a move"
+    print_endline "\nI made a move."
 ;;
 
 let opp_moves game =
@@ -274,7 +276,7 @@ let opp_moves game =
   let prompt =
     "Please specify how many cards Player "
     ^ Int.to_string player.id
-    ^ " put down"
+    ^ " put down: "
   in
   let num_cards_claimed = Int.of_string (Stdinout.loop_num_input ~prompt) in
   player.hand_size <- player.hand_size - num_cards_claimed;
@@ -283,7 +285,7 @@ let opp_moves game =
   in
   game.pot <- added_cards @ game.pot;
   (* print_s [%message (game.pot : (int * Card.t) list)]; *)
-  print_endline "Opp made a move";
+  print_endline "\nOpponent made their move. ";
   let any_calls = check_bluff_called ~game ~player ~num_cards_claimed in
   match any_calls with
   | true ->
@@ -295,9 +297,8 @@ let opp_moves game =
 
 let rec play_game ~(game : Game_state.t) =
   print_endline
-    "------------------------------------------------------------------------------";
-  print_endline
-    "------------------------------------------------------------------------------";
+    {|------------------------------------------------------------------------------
+------------------------------------------------------------------------------|};
   let player = Game_state.whos_turn game in
   let card_on_turn = Game_state.card_on_turn game in
   match Game_state.game_over game with
@@ -306,7 +307,7 @@ let rec play_game ~(game : Game_state.t) =
     let prompt1 =
       "It is Player "
       ^ Int.to_string player.id
-      ^ " turn to provide the card: "
+      ^ "'s turn to provide the card: "
       ^ Card.to_string (card_on_turn : Card.t)
     in
     print_endline prompt1;
@@ -326,8 +327,12 @@ let rec play_game ~(game : Game_state.t) =
       | false -> opp_moves game
     in
     game.round_num <- game.round_num + 1;
-    print_endline ("Cards left after move: " ^ Int.to_string player.hand_size);
     print_endline
-      ("The pot has size of: " ^ Int.to_string (List.length game.pot));
+      ("Player "
+       ^ Int.to_string player.id
+       ^ "'s hand size after move: "
+       ^ Int.to_string player.hand_size);
+    print_endline
+      ("Current pot size: " ^ Int.to_string (List.length game.pot));
     play_game ~game
 ;;

@@ -99,7 +99,7 @@ let probability_based_call
   (* given the probability an opponent is telling the complete truth, output
      the probability that they are lying, calculate an appropriate threshold
      to call, & reccomend to call or not. *)
-  let _who_claimed, _card_claied, _num_claimed = claim in
+  (* (let who_claimed, _, _ = claim in) *)
   let probability = prob_no_lie ~game_state ~claim in
   let prob_of_lie =
     Float.round_significant
@@ -108,21 +108,20 @@ let probability_based_call
   in
   print_endline
     ("Probability the player is lying: " ^ Float.to_string prob_of_lie ^ "%");
-  (*let player_bluffs = (Hashtbl.find_exn game_state.all_players
-    who_claimed).bluffs in let pot_size = List.length game_state.pot in
-
-    let my_hand_size = (Hashtbl.find_exn game_state.all_players
-    game_state.my_id).hand_size in let num_smaller_hand_sizes = List.init
-    game_state.player_count ~f:(fun id -> (Hashtbl.find_exn
-    game_state.all_players id).hand_size ) |> List.filter ~f:(fun size ->
-    size < my_hand_size) |> List.length in let percent_opps_winning =
-    (num_smaller_hand_sizes // game_state.player_count) *. 100.0 in let
-    aggression = if Float.(>.) percent_opps_winning 75.0 then true else
-
-    let threshold = (
-
-    0.0) in *)
-  Float.( >. ) prob_of_lie 75.0
+  (* (let player_bluffs = (Hashtbl.find_exn game_state.all_players
+     who_claimed).bluffs in let pot_size = List.length game_state.pot in let
+     my_hand_size = (Hashtbl.find_exn game_state.all_players
+     game_state.my_id).hand_size in let num_smaller_hand_sizes = List.init
+     game_state.player_count ~f:(fun id -> (Hashtbl.find_exn
+     game_state.all_players id).hand_size) |> List.filter ~f:(fun size ->
+     size < my_hand_size) |> List.length in let percent_opps_winning =
+     num_smaller_hand_sizes // game_state.player_count *. 100.0 in let
+     aggression = if Float.( >. ) percent_opps_winning 75.0 then 1.2 else 1.0
+     in let threshold = Int.to_float (pot_size * 3) /. (aggression *.
+     Int.to_float player_bluffs) in print_endline ("Probability threshold is:
+     " ^ Float.to_string threshold);) *)
+  let threshold = 75.0 in
+  Float.( >. ) prob_of_lie threshold
 ;;
 
 let assess_calling_bluff
@@ -137,13 +136,19 @@ let assess_calling_bluff
     bluff. *)
   let opp_id, _, _ = claim in
   let opp = Hashtbl.find_exn game_state.all_players opp_id in
-  if List.exists
-       [ conflicting_claim ~game_state ~claim
-       ; opp.hand_size = 0
-       ; useful_call ~game_state ~claim
-       ]
-       ~f:(fun strategy_check -> strategy_check)
-  then true
+  if conflicting_claim ~game_state ~claim
+  then (
+    print_endline "Probability the opponent is lying: 100%";
+    true)
+  else if opp.hand_size = 0
+  then (
+    print_endline "Your opponent is about to win the game.";
+    true)
+  else if useful_call ~game_state ~claim
+  then (
+    print_endline
+      "The pot is small and you need one of these cards in your win cycle.";
+    true)
   else probability_based_call ~game_state ~claim
 ;;
 
