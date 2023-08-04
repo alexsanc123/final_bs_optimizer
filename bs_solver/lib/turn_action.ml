@@ -42,10 +42,10 @@ let count_bluffs ~(strategy : Strategy.t) =
     strategy
     ~init:0
     ~f:(fun bluffs (card_to_provide, cards_placed) ->
-      if List.for_all cards_placed ~f:(fun card ->
-           Card.equal card_to_provide card)
-      then bluffs
-      else bluffs + 1)
+    if List.for_all cards_placed ~f:(fun card ->
+         Card.equal card_to_provide card)
+    then bluffs
+    else bluffs + 1)
 ;;
 
 let pop_tail list_to =
@@ -153,6 +153,7 @@ let rec lie_or_not
 
 let score_strategy ~strategy ~(game_state : Game_state.t) : float =
   (* Uses heuristics to evaluate the risk associated with a strategy. *)
+  let my_player = Hashtbl.find_exn game_state.all_players game_state.my_id in
   if Strategy.equal strategy []
   then Float.infinity
   else (
@@ -172,9 +173,9 @@ let score_strategy ~strategy ~(game_state : Game_state.t) : float =
                game_state.all_players
                ~init:0
                ~f:(fun ~key:id ~data:player sum_of_calls ->
-                 if id = game_state.my_id
-                 then sum_of_calls
-                 else sum_of_calls + player.calls))
+               if id = game_state.my_id
+               then sum_of_calls
+               else sum_of_calls + player.calls))
           /. Int.to_float (Hashtbl.length game_state.all_players - 1))
     in
     let _, bluffs_score =
@@ -182,19 +183,24 @@ let score_strategy ~strategy ~(game_state : Game_state.t) : float =
         strategy
         ~init:(pot_size, 0.0)
         ~f:(fun (curr_pot_size, score) move ->
-          let new_pot_size =
-            curr_pot_size + (2 * (game_state.player_count - 1))
+        let new_pot_size =
+          curr_pot_size + (2 * (game_state.player_count - 1))
+        in
+        if Strategy.move_is_bluff move
+        then (
+          let card_on_move, _ = move in
+          let cards_i_know, _ =
+            Hashtbl.find_exn my_player.cards card_on_move
           in
-          if Strategy.move_is_bluff move
-          then (
-            let _, cards_placed = move in
-            let new_score =
-              (score +. Int.to_float curr_pot_size)
-              *. call_multiplier
-              *. Int.to_float (List.length cards_placed)
-            in
-            new_pot_size, new_score)
-          else new_pot_size, score)
+          let cards_i_dont_know = Int.to_float cards_i_know in
+          let _, cards_placed = move in
+          let new_score =
+            (score +. Int.to_float curr_pot_size)
+            *. (call_multiplier +. (cards_i_dont_know /. 4.))
+            *. Int.to_float (List.length cards_placed)
+          in
+          new_pot_size, new_score)
+        else new_pot_size, score)
     in
     let score = end_multiplier *. (length +. bluffs +. bluffs_score) in
     score)
@@ -215,27 +221,25 @@ let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
       ~init:(thresh_strategy, starting_thresh_score)
       all_strategies
       ~f:(fun (strategy, score) curr_strategy ->
-        let curr_score =
-          score_strategy ~strategy:curr_strategy ~game_state
-        in
-        (* print_s[%message (strategy:Strategy.t)]; print_s[%message
-           (score:float)]; *)
-        (*add any other additional scoring with increased functionality*)
-        (* let message1 = "best strat: " ^ Strategy.to_string strategy ^ "
-           with score of " ^ Float.to_string score in let message2 = "curr
-           strat: " ^ Strategy.to_string curr_strategy ^ " with score of " ^
-           Float.to_string curr_score in print_endline message1;
-           print_endline message2; print_endline ""; *)
-        if Float.( < ) curr_score score
-        then
-          ( (* let message1 = "best strat: " ^ Strategy.to_string strategy ^
-               " with score of " ^ Float.to_string score in let message2 =
-               "curr strat: " ^ Strategy.to_string curr_strategy ^ " with
-               score of " ^ Float.to_string curr_score in print_endline
-               message1; print_endline message2; print_endline ""; *)
-            curr_strategy
-          , curr_score )
-        else strategy, score)
+      let curr_score = score_strategy ~strategy:curr_strategy ~game_state in
+      (* print_s[%message (strategy:Strategy.t)]; print_s[%message
+         (score:float)]; *)
+      (*add any other additional scoring with increased functionality*)
+      (* let message1 = "best strat: " ^ Strategy.to_string strategy ^ " with
+         score of " ^ Float.to_string score in let message2 = "curr strat: "
+         ^ Strategy.to_string curr_strategy ^ " with score of " ^
+         Float.to_string curr_score in print_endline message1; print_endline
+         message2; print_endline ""; *)
+      if Float.( < ) curr_score score
+      then
+        ( (* let message1 = "best strat: " ^ Strategy.to_string strategy ^ "
+             with score of " ^ Float.to_string score in let message2 = "curr
+             strat: " ^ Strategy.to_string curr_strategy ^ " with score of "
+             ^ Float.to_string curr_score in print_endline message1;
+             print_endline message2; print_endline ""; *)
+          curr_strategy
+        , curr_score )
+      else strategy, score)
   in
   best_strategy
 ;;
