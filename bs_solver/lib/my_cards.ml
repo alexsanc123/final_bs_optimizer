@@ -77,7 +77,7 @@ let to_string t =
     | _, _ ->
       [%string
         "%{built_string}%{card#Card} - (h: %{history#Int}, c: \
-         %{current#Int})"])
+         %{current#Int}), "])
 ;;
 
 (* include Hashable.Make (T) include
