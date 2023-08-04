@@ -15,4 +15,3 @@ end
 
 include T
 include Sexpable.To_stringable (T)
-(* include Comparable.Make (T) include Hashable.Make (T) *)

@@ -25,8 +25,6 @@ include Hashable.Make (T)
 
 (* include Hashable.Make_plain_and_derive_hash_fold_t (T) *)
 let of_int int =
-  (*This might need to start at 0, to account for matching with id and round
-    starting at 0*)
   match int with
   | 1 -> Ace
   | 2 -> Two

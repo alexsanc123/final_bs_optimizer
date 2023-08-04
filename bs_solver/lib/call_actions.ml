@@ -63,13 +63,6 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
       in
       player_known_cards + tot_card_sum, desired_qty + tot_desired_sum)
   in
-  (* let known_from_pot, desired_from_pot = List.fold game_state.pot
-     ~init:(0, 0) ~f:(fun (known_qty, desired_qty) (player_id, card) -> if
-     player_id = game_state.my_id then ( match Card.equal card card_claimed
-     with | true -> known_qty + 1, desired_qty + 1 | false -> known_qty + 1,
-     desired_qty) else known_qty, desired_qty) in let all_known_cards,
-     known_desired_qty = ( known_cards_w_players + known_from_pot ,
-     desired_cards_w_players + desired_from_pot ) in *)
   let all_known_cards, known_desired_qty =
     known_cards_w_players, desired_cards_w_players
   in
@@ -79,9 +72,6 @@ let prob_no_lie ~(game_state : Game_state.t) ~(claim : int * Card.t * int)
     + num_claimed
   in
   let unknown_cards = 52 - all_known_cards in
-  (* print_s [%message (unknown_cards : int)]; print_s [%message
-     (desired_in_unknown : int)]; print_s [%message (hand_size : int)];
-     print_s [%message (num_claimed : int)]; *)
   let probability =
     Math_fun.prob_player_has_card
       ~unknown_cards
@@ -99,7 +89,6 @@ let probability_based_call
   (* given the probability an opponent is telling the complete truth, output
      the probability that they are lying, calculate an appropriate threshold
      to call, & reccomend to call or not. *)
-  (* (let who_claimed, _, _ = claim in) *)
   let probability = prob_no_lie ~game_state ~claim in
   let prob_of_lie =
     Float.round_significant

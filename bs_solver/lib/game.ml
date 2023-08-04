@@ -292,7 +292,6 @@ let opp_moves game =
     List.init num_cards_claimed ~f:(fun _ -> player.id, card)
   in
   game.pot <- added_cards @ game.pot;
-  (* print_s [%message (game.pot : (int * Card.t) list)]; *)
   print_endline "\nOpponent made their move. ";
   let any_calls = check_bluff_called ~game ~player ~num_cards_claimed in
   match any_calls with
