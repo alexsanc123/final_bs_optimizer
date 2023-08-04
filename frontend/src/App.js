@@ -15,7 +15,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          BS optimizer
+          BS optimizer by Justin and Alex
         </a>
       </header>
     </div>
