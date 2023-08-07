@@ -1,11 +1,10 @@
 import logo from './logo.svg';
 import './App.css';
 import PlayingCardsList from './PlayingCardsList';
+// import TextInput from './TextInput';
 
 
 function App() {
-
-  let ranks = ["A"]
 
   return (
     <div><div className="App">
@@ -16,7 +15,14 @@ function App() {
       <div class="card-wrapper"><img class="card" src={PlayingCardsList["4"]}/></div>
       <div class="card-wrapper"><img class="card" src={PlayingCardsList["5"]}/></div>
       <div class="card-wrapper"><img class="card" src={PlayingCardsList["flipped"]}/></div>
-    </div></div>
+    </div>
+    <form className="Trivial">
+      <div className="row">
+        <label htmlFor='item'> New Item </label>
+        <input type="text" id="item" />
+      </div>
+    </form>
+    </div>
   );
 }
 

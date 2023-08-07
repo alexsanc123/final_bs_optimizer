@@ -1,6 +1,7 @@
 .App {
   text-align: center;
   background-color: green;
+  box-sizing: border-box;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -33,3 +34,22 @@
   }
 }
 
+.productsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.products {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 45%;
+  margin: 0 0 1em 0;
+  padding: 1em;
+  border: 1px solid black;
+}
+
+.products img {
+  margin: 0.5em 0;
+}
