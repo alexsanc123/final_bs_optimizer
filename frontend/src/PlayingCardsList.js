@@ -1,11 +1,8 @@
 let PlayingCardsList = {};
-let suits = ['c', 'd', 'h', 's'];
 let faces = ['j', 'q', 'k'];
 
 let addSuits = (i, PlayingCardsList) => {
-	for(let suit of suits){
-		PlayingCardsList[i + suit] = require('./CardImages/png/' + i + suit + '.png');
-	}
+	PlayingCardsList[i] = require('./CardImages/png/' + i + '.png');
 }
 
 for(let i = 1; i < 10; i++){
