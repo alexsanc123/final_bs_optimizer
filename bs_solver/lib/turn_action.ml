@@ -192,7 +192,7 @@ let score_strategy ~strategy ~(game_state : Game_state.t) : float =
           let cards_i_know, _ =
             Hashtbl.find_exn my_player.cards card_on_move
           in
-          let cards_i_dont_know = Int.to_float cards_i_know in
+          let cards_i_dont_know = 4. -. Int.to_float cards_i_know in
           let _, cards_placed = move in
           let new_score =
             (score +. Int.to_float curr_pot_size)
@@ -225,7 +225,8 @@ let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
       (* print_s[%message (strategy:Strategy.t)]; print_s[%message
          (score:float)]; *)
       (*add any other additional scoring with increased functionality*)
-      if Float.( < ) curr_score (2. *. score)
+      if Float.( < ) curr_score (2. *. score) then () else ();
+      if Float.( < ) curr_score score
       then (
         let message1 =
           "best strat: \n"
@@ -241,10 +242,8 @@ let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
         in
         print_endline message1;
         print_endline message2;
-        print_endline "")
-      else ();
-      if Float.( < ) curr_score score
-      then curr_strategy, curr_score
+        print_endline "";
+        curr_strategy, curr_score)
       else strategy, score)
   in
   best_strategy
