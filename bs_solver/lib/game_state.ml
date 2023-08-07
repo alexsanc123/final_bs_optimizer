@@ -1,4 +1,5 @@
 open! Core
+open Jsonaf.Export
 
 module T = struct
   type t =
@@ -8,7 +9,7 @@ module T = struct
     ; all_players : All_players.t
     ; my_id : int
     }
-  [@@deriving fields, sexp]
+  [@@deriving fields, sexp, jsonaf]
 end
 
 include T
@@ -67,7 +68,8 @@ let clear_cards_after_showdown t ~(exclude : int list) =
   (*clears all cards after showdown except my player and the id of the player
     id of the exclude*)
   Hashtbl.iteri t.all_players ~f:(fun ~key:player_id ~data:player ->
-    if player_id = t.my_id || List.exists exclude ~f:(fun ex -> ex = player_id)
+    if player_id = t.my_id
+       || List.exists exclude ~f:(fun ex -> ex = player_id)
     then ()
     else My_cards.clear_cards ~player)
 ;;

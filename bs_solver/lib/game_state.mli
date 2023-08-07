@@ -7,7 +7,7 @@ type t =
   ; all_players : All_players.t
   ; my_id : int
   }
-[@@deriving fields, sexp]
+[@@deriving fields, sexp, jsonaf]
 
 include Stringable.S with type t := t
 
@@ -15,5 +15,5 @@ val card_on_turn : t -> Card.t
 val game_over : t -> bool
 val is_my_turn : t -> bool
 val whos_turn : t -> Player.t
-val clear_cards_after_showdown : t -> exclude:(int list) -> unit
+val clear_cards_after_showdown : t -> exclude:int list -> unit
 val test_game_state : unit -> t

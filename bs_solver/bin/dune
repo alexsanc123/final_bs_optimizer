@@ -1,4 +1,6 @@
 (executable
  (public_name bs_solver)
  (name main)
- (libraries bs_solver async core))
+ (libraries bs_solver async core)
+ (preprocess
+  (pps ppx_jane)))
