@@ -9,9 +9,12 @@ function App() {
 
   return (
     <div className="App">
-      <h1> BS optimizer by Justin and Alex </h1>
+      <h1> BS optimizer</h1>
       <Card rank="A" suit="S"/>
-    </div>
+      <Card rank="10" suit="C"/>
+      <Card rank="7" suit="H"/>
+      <Card rank="9" suit="D"/>
+      </div>
   );
 }
 
