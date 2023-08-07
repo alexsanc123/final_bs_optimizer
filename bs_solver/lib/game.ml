@@ -121,7 +121,7 @@ let showdown
 Showdown
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*|};
   let prompt =
-    {|Please specify the Rank of the card you received
+    {|Please specify the Rank of the card revealed in the showdown
 e.g. 2 - representing the Two|}
   in
   let players_not_in_pot =
