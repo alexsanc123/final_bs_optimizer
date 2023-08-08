@@ -1,25 +1,21 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useState, useEffect } from 'react';
+import FetchWorld from './FetchWorld';
+import StartPage from './components/StartPage';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import InfoPage from './components/InfoPage';
+// import ContactPage from './components/ContactPage';
 
 function App() {
+ let world = FetchWorld();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          BS optimizer by Justin and Alex
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route path="/" exact component={StartPage} />
+        <Route path="/infopage" component={InfoPage} />
+      </Switch>
+    </Router>
   );
-}
+};
 
-export default App;
+export default App
