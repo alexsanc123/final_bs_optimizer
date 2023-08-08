@@ -1,11 +1,13 @@
 open! Core
+open Jsonaf.Export
 
 module T = struct
-  type t = (Card.t * Card.t list) list [@@deriving sexp, compare, equal]
+  type t = (Card.t * Card.t list) list [@@deriving sexp, compare, equal, jsonaf]
 end
 
 include T
 include Sexpable.To_stringable (T)
+
 
 let move_is_bluff (move : Card.t * Card.t list) : bool =
   (* Indicates whether there is a difference in cards put down and the card

@@ -1,6 +1,6 @@
 open! Core
 
-type t = (int * int) Card.Table.t [@@deriving sexp]
+type t = (int * int) Card.Table.t [@@deriving sexp, jsonaf]
 
 include Stringable.S with type t := t
 
