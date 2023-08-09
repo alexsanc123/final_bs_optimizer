@@ -2,9 +2,19 @@ open! Core
 open Async
 module Server = Cohttp_async.Server
 open! Backend
+open! Jsonaf.Export
 
-(* let world_state = World_state.init () *)
-let world_state = World_state.test_world ()
+module Message = struct
+  type t = { message : string } [@@deriving fields, sexp, jsonaf]
+
+  let string_to_json_msg string =
+    let t = { message = string } in
+    Jsonaf.to_string (t |> jsonaf_of_t)
+  ;;
+end
+
+let world_state = World_state.init ()
+(* let world_state = World_state.test_world () *)
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
@@ -17,15 +27,25 @@ let handler ~body:_ _sock req =
   | "/create_game" ->
     let query = Game_info.parse_game_info uri in
     (match query with
-     | None -> Server.respond_string "No game created." ~headers:header
+     | None ->
+       let message = { Message.message = "No game created." } in
+       Server.respond_string
+         (Jsonaf.to_string (message |> Message.jsonaf_of_t))
+         ~headers:header
      | Some { num_players; my_position; ace_pos; hand } ->
+       let game_info =
+         { Game_info.num_players; my_position; ace_pos; hand }
+       in
        if Game_info.invalid_arguments
             ~num_players
             ~my_position
             ~hand
             ~ace_pos
-       then Server.respond_string "Invalid arguments" ~headers:header
+       then (
+         let json_string = Message.string_to_json_msg "Invalid Argument" in
+         Server.respond_string json_string ~headers:header)
        else (
+         print_s [%message (game_info : Game_info.t)];
          let my_true_pos = (my_position - ace_pos) % num_players in
          let game_state =
            Game_for_react.game_init
@@ -44,14 +64,14 @@ let handler ~body:_ _sock req =
          world_state.whose_turn <- Some 0;
          world_state.card_on_turn <- Some Card.Ace;
          world_state.strategy <- Some strategy;
-         Server.respond_string "Game created"))
+         let json_string = Message.string_to_json_msg "Game created" in
+         print_endline json_string;
+         Server.respond_string json_string ~headers:header))
   | "/opponent_move" ->
     let query = Opponent_move.parse_opp_move uri in
     (match query with
      | None ->
-       Server.respond_string
-         "Opp hasn't made a move yet."
-         ~headers:header
+       Server.respond_string "Opp hasn't made a move yet." ~headers:header
      | Some { num_cards } ->
        if Opponent_move.invalid_arguments ~num_cards
        then Server.respond_string "Invalid arguments"
@@ -136,7 +156,9 @@ let handler ~body:_ _sock req =
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
-         Server.respond_string "Opponent showdown has been completed." ~headers:header))
+         Server.respond_string
+           "Opponent showdown has been completed."
+           ~headers:header))
   | "/my_showdown" ->
     let query = My_showdown.parse_my_showdown uri in
     (match query with

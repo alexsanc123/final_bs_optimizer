@@ -10,13 +10,16 @@ import FetchWorld from "../FetchWorld";
 
 function InfoPage(BrowserRouter, world_state) {
   const [currentGame, setCurrentGame] = useState(null);
-  const [playerCount, setPlayerCount] = useState(null);
   const [whoseTurn, setWhoseTurn] = useState(null);
   const [cardOnTurn, setCardOnTurn] = useState(null);
+  const [strategy, setStrategy] = useState(null);
+
   const [roundNum, setRoundNum] = useState(null);
+  const [playerCount, setPlayerCount] = useState(null);
   const [pot, setPot] = useState(null);
-  const [myId, setMyId] = useState(null);
   const [allPlayers, setAllPlayers] = useState(null);
+  const [myId, setMyId] = useState(null);
+  
   function fetchGameState() {
     return FetchWorld()
       .then((world) => {
@@ -38,7 +41,7 @@ function InfoPage(BrowserRouter, world_state) {
     fetchGameState();
   }, []);
   // console.log(whoseTurn);
-  if ((whoseTurn === myId)) {
+  if (whoseTurn === myId) {
     return <Redirect to="/myturn" />;
   } else {
     return <Redirect to="/oppturn" />;

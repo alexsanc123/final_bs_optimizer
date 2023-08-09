@@ -19,7 +19,7 @@ function StartPage(BrowserRouter, world_state) {
     /*local hostname of comp*/
     let uri =
       "http://ec2-44-208-58-34.compute-1.amazonaws.com:8181/" +
-      "world_state?num_players=" +
+      "create_game?num_players=" +
       input1 +
       "&my_position=" +
       input2 +
@@ -29,18 +29,22 @@ function StartPage(BrowserRouter, world_state) {
       input4;
     fetch(uri)
       .then(function (response) {
+        console.log(response);
+        
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        const ack = data["message"];
+        console.log(ack);
 
-        if (data === "Invalid arguments") {
+        if (ack === "Invalid fg vdcxarguments") {
           console.log("BAD INPUT");
           setInput1("");
           setInput2("");
           setInput3("");
           setInput4("");
-        } else {
+        }
+        if (ack === "Game created") {
           setData(data);
           console.log(data);
           setShouldISwitch(true);

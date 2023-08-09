@@ -21,7 +21,7 @@ module Game_info : sig
     ; ace_pos : int
     ; hand : Card.t list
     }
-  [@@deriving fields]
+  [@@deriving fields, sexp]
 
   val parse_game_info : Uri.t -> t option
 

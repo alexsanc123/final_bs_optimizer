@@ -15,7 +15,7 @@ val bluff_recomendation
   -> claim:int * Card.t * int
   -> string
 
-val pot_consequencs
+val pot_consequences
   :  game:Game_state.t
   -> who_lost:Player.t
   -> rest_of_pot:(int * Card.t) list

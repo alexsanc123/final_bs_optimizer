@@ -20,11 +20,9 @@ module World_state = struct
 
   let test_world () : t =
     { current_game = Some (Game_state.test_game_state ())
-    ; player_count = Some 5
-    ; my_pos = Some 1
-    ; ace_pos = Some 0
     ; whose_turn = Some 0
     ; card_on_turn = Some Card.Ace
+    ; strategy = Some []
     }
   ;;
 end
@@ -36,7 +34,7 @@ module Game_info = struct
     ; ace_pos : int
     ; hand : Card.t list
     }
-  [@@deriving fields]
+  [@@deriving fields, sexp]
 
   let parse_game_info uri : t option =
     let open Option.Let_syntax in
@@ -61,9 +59,8 @@ module Game_info = struct
     ~(hand : Card.t list)
     : bool
     =
-    let my_true_pos = (my_position - ace_pos) % num_players in
     let my_hand_size =
-      if my_true_pos < 52 % num_players
+      if my_position < 52 % num_players
       then (52 / num_players) + 1
       else 52 / num_players
     in
