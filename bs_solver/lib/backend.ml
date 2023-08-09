@@ -4,9 +4,6 @@ open! Jsonaf.Export
 module World_state = struct
   type t =
     { mutable current_game : Game_state.t option
-    ; mutable player_count : int option
-    ; mutable my_pos : int option
-    ; mutable ace_pos : int option
     ; mutable whose_turn : int option
     ; mutable card_on_turn : Card.t option
     ; mutable strategy : Strategy.t option
@@ -15,9 +12,6 @@ module World_state = struct
 
   let init () : t =
     { current_game = None
-    ; player_count = None
-    ; my_pos = None
-    ; ace_pos = None
     ; whose_turn = None
     ; card_on_turn = None
     ; strategy = None
@@ -125,8 +119,7 @@ end
 
 module Opp_showdown = struct
   type t =
-    { bluff_called : bool
-    ; caller_id : int
+    { caller_id : int
     ; cards_revealed : Card.t list
     }
   [@@deriving fields]
@@ -135,10 +128,8 @@ module Opp_showdown = struct
     let open Option.Let_syntax in
     let%bind caller_id = Uri.get_query_param uri "caller_id" in
     let%bind cards_revealed = Uri.get_query_param uri "cards_revealed" in
-    let%bind bluff_called = Uri.get_query_param uri "bluff_called" in
     Some
-      { bluff_called = Bool.of_string bluff_called
-      ; caller_id = Int.of_string caller_id
+      { caller_id = Int.of_string caller_id
       ; cards_revealed =
           String.fold
             ~init:[]
@@ -147,6 +138,8 @@ module Opp_showdown = struct
             Card.of_char card :: card_list_so_far)
       }
   ;;
+
+  let invalid_arguments ~(caller_id : int) ~(def : int) = caller_id = def
 end
 
 module My_showdown = struct
@@ -157,4 +150,6 @@ module My_showdown = struct
     let%bind caller_id = Uri.get_query_param uri "caller_id" in
     Some { caller_id = Int.of_string caller_id }
   ;;
+
+  let invalid_arguments ~(caller_id : int) ~(def : int) = caller_id = def
 end

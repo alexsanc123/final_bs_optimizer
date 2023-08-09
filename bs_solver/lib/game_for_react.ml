@@ -48,11 +48,6 @@ let game_init
   }
 ;;
 
-let end_processes game =
-  ignore game;
-  print_endline "Wow game is over"
-;;
-
 let bluff_recomendation ~game ~claim : string =
   let reccs = Call_actions.assess_calling_bluff ~game_state:game ~claim in
   let conflicting, conflicting_rec = reccs.conflicting in
@@ -67,12 +62,46 @@ let bluff_recomendation ~game ~claim : string =
       if useful then use_rec else reccs.probability))
 ;;
 
+let pot_consequences
+  ~(game : Game_state.t)
+  ~(who_lost : Player.t)
+  ~(rest_of_pot : (int * Card.t) list)
+  ~(players_not_in_pot : int list)
+  ?(revealed_pot = [])
+  ()
+  =
+  if who_lost.id = game.my_id
+  then
+    List.iteri (List.rev rest_of_pot) ~f:(fun index (pot_id, card) ->
+      let actual_card = List.nth_exn revealed_pot index in
+      match Card.equal actual_card card with
+      | true -> My_cards.add_card who_lost.cards ~card
+      | false ->
+        let pot_player = Hashtbl.find_exn game.all_players pot_id in
+        pot_player.bluffs <- pot_player.bluffs + 1;
+        My_cards.add_card who_lost.cards ~card:actual_card)
+  else
+    List.iter rest_of_pot ~f:(fun (pot_id, card) ->
+      if pot_id = game.my_id then My_cards.add_card who_lost.cards ~card);
+  Game_state.clear_cards_after_showdown
+    game
+    ~exclude:(players_not_in_pot @ [ who_lost.id ]);
+  game.pot <- []
+;;
+
 let showdown
   ~(game : Game_state.t)
   ~(acc : Player.t)
   ~(def : Player.t)
-  ~num_cards_claimed
+  ?(cards_revealed = [])
+  ()
   =
+  let num_cards_claimed, _ =
+    List.fold game.pot ~init:(0, false) ~f:(fun (qty, satisfied) (id, _) ->
+      if not satisfied
+      then if id = def.id then qty + 1, satisfied else qty, true
+      else qty, satisfied)
+  in
   let players_not_in_pot =
     List.filter_map (Hashtbl.keys game.all_players) ~f:(fun id ->
       if List.exists game.pot ~f:(fun (pot_id, _) -> id = pot_id)
@@ -83,15 +112,10 @@ let showdown
   let claimed_of_pot, rest_of_pot =
     List.split_n game.pot num_cards_claimed
   in
-  (* print_s [%message (rest_of_pot : (int * Card.t) list)]; *)
   let revealed_cards =
     if def.id = game.my_id
     then List.map claimed_of_pot ~f:(fun (_, card) -> card)
-    else
-      List.init num_cards_claimed ~f:(fun _ ->
-        let card_input_string = Stdinout.loop_card_input ~prompt in
-        let card = Card.of_string card_input_string in
-        card)
+    else cards_revealed
   in
   let who_lost =
     if List.for_all revealed_cards ~f:(fun card ->
@@ -122,71 +146,14 @@ let showdown
       My_cards.add_card who_lost.cards ~card:card_to_add));
   if who_lost.id = game.my_id
   then
-    List.iter (List.rev rest_of_pot) ~f:(fun (pot_id, card) ->
-      let message =
-        "Player "
-        ^ Int.to_string pot_id
-        ^ " claimed "
-        ^ Card.to_string card
-        ^ " \n What card did they put down?"
-      in
-      print_endline message;
-      let card_input_string = Stdinout.loop_card_input ~prompt in
-      let actual_card = Card.of_string card_input_string in
-      match Card.equal actual_card card with
-      | true -> My_cards.add_card who_lost.cards ~card
-      | false ->
-        let pot_player = Hashtbl.find_exn game.all_players pot_id in
-        pot_player.bluffs <- pot_player.bluffs + 1;
-        My_cards.add_card who_lost.cards ~card:actual_card)
-  else
-    List.iter rest_of_pot ~f:(fun (pot_id, card) ->
-      if pot_id = game.my_id then My_cards.add_card who_lost.cards ~card);
-  Game_state.clear_cards_after_showdown
-    game
-    ~exclude:(players_not_in_pot @ [ who_lost.id ]);
-  game.pot <- []
-;;
-
-let check_bluff_called
-  ~(game : Game_state.t)
-  ~(player : Player.t)
-  ~num_cards_claimed
-  =
-  if not (player.id = game.my_id)
-  then
-    bluff_recomendation
+    pot_consequences
+      ()
       ~game
-      ~claim:(player.id, Game_state.card_on_turn game, num_cards_claimed);
-  let prompt =
-    "Has anyone called Player "
-    ^ Int.to_string player.id
-    ^ "'s bluff? Type false and the round will continue"
-  in
-  let any_calls = Bool.of_string (Stdinout.loop_bool_input ~prompt) in
-  any_calls
-;;
-
-let bluff_called
-  ~(game : Game_state.t)
-  ~(player : Player.t)
-  ~num_cards_claimed
-  =
-  let prompt =
-    "Type in the id of the player who called the bluff or 'me' if you \
-     called bluff"
-  in
-  let caller =
-    Stdinout.loop_bluff_input ~prompt ~bluffer_id:player.id ~my_id:game.my_id
-  in
-  let caller_id =
-    match caller with "me" -> game.my_id | _ -> Int.of_string caller
-  in
-  showdown
-    ~game
-    ~acc:(Hashtbl.find_exn game.all_players caller_id)
-    ~def:player
-    ~num_cards_claimed
+      ~who_lost
+      ~rest_of_pot
+      ~players_not_in_pot
+      ~revealed_pot:cards_revealed
+  else pot_consequences ~game ~who_lost ~rest_of_pot ~players_not_in_pot ()
 ;;
 
 let my_moves game ~(num_cards : int) ~(cards_put_down : Card.t list) =
@@ -207,46 +174,4 @@ let opp_moves game ~num_cards =
   let added_cards = List.init num_cards ~f:(fun _ -> player.id, card) in
   game.pot <- added_cards @ game.pot;
   My_cards.update_after_move ~player ~move:(card, num_cards)
-;;
-
-let rec _play_game ~(game : Game_state.t) =
-  print_endline
-    {|------------------------------------------------------------------------------
-------------------------------------------------------------------------------|};
-  let player = Game_state.whos_turn game in
-  let card_on_turn = Game_state.card_on_turn game in
-  match Game_state.game_over game with
-  | true -> end_processes game
-  | false ->
-    let prompt1 =
-      "It is Player "
-      ^ Int.to_string player.id
-      ^ "'s turn to provide the card: "
-      ^ Card.to_string (card_on_turn : Card.t)
-    in
-    print_endline prompt1;
-    if player.id = game.my_id
-    then ()
-    else (
-      let prompt2 =
-        "We know Player "
-        ^ Int.to_string player.id
-        ^ " has cards: "
-        ^ My_cards.to_string player.cards
-      in
-      print_endline prompt2);
-    let _ =
-      match Game_state.is_my_turn game with
-      | true -> my_moves game
-      | false -> opp_moves game
-    in
-    game.round_num <- game.round_num + 1;
-    print_endline
-      ("Player "
-       ^ Int.to_string player.id
-       ^ "'s hand size after move: "
-       ^ Int.to_string player.hand_size);
-    print_endline
-      ("Current pot size: " ^ Int.to_string (List.length game.pot));
-    _play_game ~game
 ;;

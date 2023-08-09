@@ -4,9 +4,6 @@ open! Jsonaf.Export
 module World_state : sig
   type t =
     { mutable current_game : Game_state.t option
-    ; mutable player_count : int option
-    ; mutable my_pos : int option
-    ; mutable ace_pos : int option
     ; mutable whose_turn : int option
     ; mutable card_on_turn : Card.t option
     ; mutable strategy : Strategy.t option
@@ -60,17 +57,18 @@ end
 
 module Opp_showdown : sig
   type t =
-    { bluff_called : bool
-    ; caller_id : int
+    { caller_id : int
     ; cards_revealed : Card.t list
     }
   [@@deriving fields]
 
   val parse_opp_showdown : Uri.t -> t option
+  val invalid_arguments : caller_id:int -> def:int -> bool
 end
 
 module My_showdown : sig
   type t = { caller_id : int } [@@deriving fields]
 
   val parse_my_showdown : Uri.t -> t option
+  val invalid_arguments : caller_id:int -> def:int -> bool
 end
