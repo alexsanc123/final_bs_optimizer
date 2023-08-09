@@ -28,9 +28,7 @@ function StartPage(BrowserRouter, world_state) {
       "&hand=" +
       input4;
     fetch(uri)
-      .then(function (response) {
-        console.log(response);
-        
+      .then(function (response) {        
         return response.json();
       })
       .then((data) => {
