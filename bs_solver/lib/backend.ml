@@ -81,6 +81,16 @@ module Opponent_move = struct
   let invalid_arguments ~num_cards = num_cards < 0 || num_cards > 4
 end
 
+module Bluff_check = struct
+  type t = { bluff_called : bool } [@@deriving fields]
+
+  let parse_bluff uri : t option =
+    let open Option.Let_syntax in
+    let%bind bluff_called = Uri.get_query_param uri "bluff_called" in
+    Some { bluff_called = Bool.of_string bluff_called }
+  ;;
+end
+
 module My_move = struct
   type t =
     { num_cards : int

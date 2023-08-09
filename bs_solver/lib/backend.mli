@@ -39,6 +39,12 @@ module Opponent_move : sig
   val invalid_arguments : num_cards:int -> bool
 end
 
+module Bluff_check : sig
+  type t = { bluff_called : bool } [@@deriving fields]
+
+  val parse_bluff : Uri.t -> t option
+end
+
 module My_move : sig
   type t =
     { num_cards : int

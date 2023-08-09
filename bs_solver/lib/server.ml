@@ -16,7 +16,7 @@ let handler ~body:_ _sock req =
   | "/create_game" ->
     let query = Game_info.parse_game_info uri in
     (match query with
-     | None -> Server.respond_string "Invalid arguments" ~headers:header
+     | None -> Server.respond_string "No game created." ~headers:header
      | Some { num_players; my_position; ace_pos; hand } ->
        if Game_info.invalid_arguments
             ~num_players
@@ -43,13 +43,13 @@ let handler ~body:_ _sock req =
          world_state.whose_turn <- Some 0;
          world_state.card_on_turn <- Some Card.Ace;
          world_state.strategy <- Some strategy;
-         Server.respond_string "Valid Arguments"))
+         Server.respond_string "Game created"))
   | "/opponent_move" ->
     let query = Opponent_move.parse_opp_move uri in
     (match query with
      | None ->
        Server.respond_string
-         "Opponent has not made a move yet."
+         "Opp hasn't made a move yet."
          ~headers:header
      | Some { num_cards } ->
        if Opponent_move.invalid_arguments ~num_cards
@@ -68,10 +68,7 @@ let handler ~body:_ _sock req =
              ~claim:(player.id, card, num_cards)
          in
          Game_for_react.opp_moves game ~num_cards;
-         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
-         world_state.whose_turn <- Some (Game_state.whos_turn game).id;
-         world_state.card_on_turn <- Some (Game_state.card_on_turn game);
          Server.respond_string reccomendation ~headers:header))
   | "/my_move" ->
     let query = My_move.parse_my_move uri in
@@ -88,25 +85,39 @@ let handler ~body:_ _sock req =
        then Server.respond_string "Invalid arguments"
        else (
          Game_for_react.my_moves game ~num_cards ~cards_put_down;
-         let me = Hashtbl.find_exn game.all_players game.my_id in
-         let win_cycle =
-           Util_functions.calc_win_cycle ~me ~game_state:game
-         in
-         let strategy =
-           Turn_action.evaluate_strategies ~win_cycle ~game_state:game
-         in
-         world_state.strategy <- Some strategy;
+         Server.respond_string "I have made a move." ~headers:header))
+  | "/check_bluff" ->
+    let query = Bluff_check.parse_bluff uri in
+    (match query with
+     | None ->
+       Server.respond_string
+         "Showdown has not been initiated."
+         ~headers:header
+     | Some { bluff_called } ->
+       let game =
+         match World_state.current_game world_state with
+         | Some game_state -> game_state
+         | _ -> failwith "Invalid game"
+       in
+       if bluff_called
+       then
+         Server.respond_string
+           "A showdown has been initiated."
+           ~headers:header
+       else (
          game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
-         Server.respond_string "I have made a move." ~headers:header))
+         Server.respond_string
+           "A showdown has not been initiated. Move on to the next turn. "
+           ~headers:header))
   | "/opp_showdown" ->
     let query = Opp_showdown.parse_opp_showdown uri in
     (match query with
      | None ->
        Server.respond_string
-         "Showdown has not been initiated."
+         "Showdown information has not been recieved."
          ~headers:header
      | Some { caller_id; cards_revealed } ->
        let game =
@@ -115,22 +126,22 @@ let handler ~body:_ _sock req =
          | _ -> failwith "Invalid game"
        in
        let acc = Hashtbl.find_exn game.all_players caller_id in
-       let def =
-         let player_id = (game.round_num - 1) % game.player_count in
-         Hashtbl.find_exn game.all_players player_id
-       in
+       let def = Game_state.whos_turn game in
        if Opp_showdown.invalid_arguments ~caller_id ~def:def.id
        then Server.respond_string "Invalid arguments"
        else (
          Game_for_react.showdown ~game ~acc ~def ~cards_revealed ();
+         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
-         Server.respond_string "Showdown has been completed." ~headers:header))
+         world_state.whose_turn <- Some (Game_state.whos_turn game).id;
+         world_state.card_on_turn <- Some (Game_state.card_on_turn game);
+         Server.respond_string "Opponent showdown has been completed." ~headers:header))
   | "/my_showdown" ->
     let query = My_showdown.parse_my_showdown uri in
     (match query with
      | None ->
        Server.respond_string
-         "Showdown has not been initiated."
+         "Showdown information has not been recieved."
          ~headers:header
      | Some { caller_id } ->
        let game =
