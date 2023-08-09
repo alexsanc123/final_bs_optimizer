@@ -63,7 +63,7 @@ let handler ~body:_ _sock req =
          let player = Game_state.whos_turn game in
          let card = Game_state.card_on_turn game in
          let reccomendation =
-           Game_for_react.bluff_reccomendation
+           Game_for_react.bluff_recomendation
              ~game
              ~claim:(player.id, card, num_cards)
          in
@@ -115,12 +115,16 @@ let handler ~body:_ _sock req =
          | _ -> failwith "Invalid game"
        in
        let acc = Hashtbl.find_exn game.all_players caller_id in
-       let def = Game_state.whos_turn game in
+       let def =
+         let player_id = (game.round_num - 1) % game.player_count in
+         Hashtbl.find_exn game.all_players player_id
+       in
        if Opp_showdown.invalid_arguments ~caller_id ~def:def.id
        then Server.respond_string "Invalid arguments"
        else (
          Game_for_react.showdown ~game ~acc ~def ~cards_revealed ();
-         Server.respond_string "Showdown has been initiated." ~headers:header))
+         world_state.current_game <- Some game;
+         Server.respond_string "Showdown has been completed." ~headers:header))
   | "/my_showdown" ->
     let query = My_showdown.parse_my_showdown uri in
     (match query with
@@ -140,7 +144,8 @@ let handler ~body:_ _sock req =
        then Server.respond_string "Invalid arguments"
        else (
          Game_for_react.showdown ~game ~acc ~def ();
-         Server.respond_string "Showdown has been initiated." ~headers:header))
+         world_state.current_game <- Some game;
+         Server.respond_string "Showdown has been completed." ~headers:header))
   | _ ->
     Server.respond_string
       ~status:`Not_found

@@ -10,6 +10,11 @@ val game_init
   -> unit
   -> Game_state.t
 
+val bluff_recomendation
+  :  game:Game_state.t
+  -> claim:int * Card.t * int
+  -> string
+
 val opp_moves : Game_state.t -> num_cards:int -> unit
 
 val showdown
@@ -19,11 +24,6 @@ val showdown
   -> ?cards_revealed:Card.t list
   -> unit
   -> unit
-
-val bluff_reccomendation
-  :  game:Game_state.t
-  -> claim:int * Card.t * int
-  -> string
 
 val my_moves
   :  Game_state.t

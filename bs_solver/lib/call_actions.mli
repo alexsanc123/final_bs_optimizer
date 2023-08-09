@@ -29,3 +29,8 @@ val assess_calling_bluff
   :  game_state:Game_state.t
   -> claim:int * Card.t * int
   -> Opp_rec.t
+
+val assess_bluff
+  :  game_state:Game_state.t
+  -> claim:int * Card.t * int
+  -> bool

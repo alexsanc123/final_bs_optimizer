@@ -160,6 +160,34 @@ let assess_calling_bluff
   }
 ;;
 
+let assess_bluff ~(game_state : Game_state.t) ~(claim : int * Card.t * int) =
+  (*for command line tool sicne i messed up the one above lol *)
+  let opp_id, _, _ = claim in
+  let opp = Hashtbl.find_exn game_state.all_players opp_id in
+  if conflicting_claim ~game_state ~claim
+  then (
+    print_endline "Probability the opponent is lying: 100%";
+    true)
+  else if opp.hand_size = 0
+  then (
+    print_endline "Your opponent is about to win the game.";
+    true)
+  else if useful_call ~game_state ~claim
+  then (
+    print_endline
+      "The pot is small and you need one of these cards to complete your \
+       cycle.";
+    true)
+  else (
+    let probability = prob_no_lie ~game_state ~claim in
+    let prob_of_lie =
+      Float.round_significant
+        ~significant_digits:3
+        ((1. -. probability) *. 100.0)
+    in
+    Float.( >. ) prob_of_lie 75.0)
+;;
+
 (* let check_opponent_win ~(game_state : Game_state.t) ~(claim : int * Card.t
    * int) = (*If an opponent's claim on their turn allows them to win the
    game, call bluff (GAME WOULD BE OVER IF THEY SUCCEEDED...) )*) (*assumes

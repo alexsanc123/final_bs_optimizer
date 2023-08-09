@@ -103,7 +103,7 @@ let bluff_recomendation ~game ~claim =
     {|*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 Reccomendation: |};
   let should_i_call =
-    Call_actions.assess_calling_bluff ~game_state:game ~claim
+    Call_actions.assess_bluff ~game_state:game ~claim
   in
   print_endline ("Should I Call: " ^ Bool.to_string should_i_call);
   print_endline
