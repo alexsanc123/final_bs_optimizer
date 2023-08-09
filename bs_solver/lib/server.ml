@@ -3,7 +3,8 @@ open Async
 module Server = Cohttp_async.Server
 open! Backend
 
-let world_state = World_state.init ()
+(* let world_state = World_state.init () *)
+let world_state = World_state.test_world ()
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in

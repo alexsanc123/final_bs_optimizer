@@ -21,6 +21,16 @@ module World_state = struct
     ; card_on_turn = None
     }
   ;;
+
+  let test_world () : t =
+    { current_game = Some (Game_state.test_game_state ())
+    ; player_count = Some 5
+    ; my_pos = Some 1
+    ; ace_pos = Some 0
+    ; whose_turn = Some 0
+    ; card_on_turn = Some Card.Ace
+    }
+  ;;
 end
 
 module Game_info = struct

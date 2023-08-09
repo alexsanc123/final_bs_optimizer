@@ -13,6 +13,7 @@ module World_state : sig
   [@@deriving fields, sexp, jsonaf]
 
   val init : unit -> t
+  val test_world : unit -> t
 end
 
 module Game_info : sig
