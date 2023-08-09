@@ -25,6 +25,7 @@ module World_state = struct
     ; whose_turn = Some 0
     ; card_on_turn = Some Card.Ace
     ; strategy = Some []
+    ; last_move = None
     }
   ;;
 end
