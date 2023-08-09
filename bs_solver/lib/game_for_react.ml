@@ -62,38 +62,12 @@ let bluff_recomendation ~game ~claim : string =
       if useful then use_rec else reccs.probability))
 ;;
 
-let pot_consequences
-  ~(game : Game_state.t)
-  ~(who_lost : Player.t)
-  ~(rest_of_pot : (int * Card.t) list)
-  ~(players_not_in_pot : int list)
-  ?(revealed_pot = [])
-  ()
-  =
-  if who_lost.id = game.my_id
-  then
-    List.iteri (List.rev rest_of_pot) ~f:(fun index (pot_id, card) ->
-      let actual_card = List.nth_exn revealed_pot index in
-      match Card.equal actual_card card with
-      | true -> My_cards.add_card who_lost.cards ~card
-      | false ->
-        let pot_player = Hashtbl.find_exn game.all_players pot_id in
-        pot_player.bluffs <- pot_player.bluffs + 1;
-        My_cards.add_card who_lost.cards ~card:actual_card)
-  else
-    List.iter rest_of_pot ~f:(fun (pot_id, card) ->
-      if pot_id = game.my_id then My_cards.add_card who_lost.cards ~card);
-  Game_state.clear_cards_after_showdown
-    game
-    ~exclude:(players_not_in_pot @ [ who_lost.id ]);
-  game.pot <- []
-;;
-
 let showdown
   ~(game : Game_state.t)
   ~(acc : Player.t)
   ~(def : Player.t)
   ?(cards_revealed = [])
+  ?(pot = [])
   ()
   =
   let num_cards_claimed, _ =
@@ -146,14 +120,21 @@ let showdown
       My_cards.add_card who_lost.cards ~card:card_to_add));
   if who_lost.id = game.my_id
   then
-    pot_consequences
-      ()
-      ~game
-      ~who_lost
-      ~rest_of_pot
-      ~players_not_in_pot
-      ~revealed_pot:cards_revealed
-  else pot_consequences ~game ~who_lost ~rest_of_pot ~players_not_in_pot ()
+    List.iteri (List.rev rest_of_pot) ~f:(fun index (pot_id, card) ->
+      let actual_card = List.nth_exn pot index in
+      match Card.equal actual_card card with
+      | true -> My_cards.add_card who_lost.cards ~card
+      | false ->
+        let pot_player = Hashtbl.find_exn game.all_players pot_id in
+        pot_player.bluffs <- pot_player.bluffs + 1;
+        My_cards.add_card who_lost.cards ~card:actual_card)
+  else
+    List.iter rest_of_pot ~f:(fun (pot_id, card) ->
+      if pot_id = game.my_id then My_cards.add_card who_lost.cards ~card);
+  Game_state.clear_cards_after_showdown
+    game
+    ~exclude:(players_not_in_pot @ [ who_lost.id ]);
+  game.pot <- []
 ;;
 
 let my_moves game ~(num_cards : int) ~(cards_put_down : Card.t list) =

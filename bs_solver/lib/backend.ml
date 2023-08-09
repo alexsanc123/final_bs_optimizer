@@ -7,6 +7,7 @@ module World_state = struct
     ; mutable whose_turn : int option
     ; mutable card_on_turn : Card.t option
     ; mutable strategy : Strategy.t option
+    ; mutable last_move : Card.t list option
     }
   [@@deriving fields, sexp, jsonaf]
 
@@ -15,6 +16,7 @@ module World_state = struct
     ; whose_turn = None
     ; card_on_turn = None
     ; strategy = None
+    ; last_move = None
     }
   ;;
 end
@@ -51,9 +53,8 @@ module Game_info = struct
     ~(hand : Card.t list)
     : bool
     =
-    let my_true_pos = (my_position - ace_pos) % num_players in
     let my_hand_size =
-      if my_true_pos < 52 % num_players
+      if my_position < 52 % num_players
       then (52 / num_players) + 1
       else 52 / num_players
     in
@@ -88,6 +89,11 @@ module Bluff_check = struct
     let open Option.Let_syntax in
     let%bind bluff_called = Uri.get_query_param uri "bluff_called" in
     Some { bluff_called = Bool.of_string bluff_called }
+  ;;
+
+  let invalid_arguments ~caller_id ~game =
+    let def = Game_state.whos_turn game in
+    caller_id = def.id
   ;;
 end
 
@@ -152,13 +158,35 @@ module Opp_showdown = struct
   let invalid_arguments ~(caller_id : int) ~(def : int) = caller_id = def
 end
 
-module My_showdown = struct
+module My_showdown_won = struct
   type t = { caller_id : int } [@@deriving fields]
 
   let parse_my_showdown uri : t option =
     let open Option.Let_syntax in
     let%bind caller_id = Uri.get_query_param uri "caller_id" in
     Some { caller_id = Int.of_string caller_id }
+  ;;
+
+  let invalid_arguments ~(caller_id : int) ~(def : int) = caller_id = def
+end
+
+module My_showdown_lost = struct
+  type t =
+    { caller_id : int
+    ; pot : Card.t list
+    }
+  [@@deriving fields]
+
+  let parse_my_showdown uri : t option =
+    let open Option.Let_syntax in
+    let%bind caller_id = Uri.get_query_param uri "caller_id" in
+    let%bind pot = Uri.get_query_param uri "pot" in
+    Some
+      { caller_id = Int.of_string caller_id
+      ; pot =
+          String.fold ~init:[] pot ~f:(fun card_list_so_far card ->
+            card_list_so_far @ [ Card.of_char card ])
+      }
   ;;
 
   let invalid_arguments ~(caller_id : int) ~(def : int) = caller_id = def

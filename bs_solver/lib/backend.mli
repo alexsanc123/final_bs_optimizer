@@ -7,6 +7,7 @@ module World_state : sig
     ; mutable whose_turn : int option
     ; mutable card_on_turn : Card.t option
     ; mutable strategy : Strategy.t option
+    ; mutable last_move : Card.t list option
     }
   [@@deriving fields, sexp, jsonaf]
 
@@ -43,6 +44,7 @@ module Bluff_check : sig
   type t = { bluff_called : bool } [@@deriving fields]
 
   val parse_bluff : Uri.t -> t option
+  val invalid_arguments : caller_id:int -> game:Game_state.t -> bool
 end
 
 module My_move : sig
@@ -72,8 +74,19 @@ module Opp_showdown : sig
   val invalid_arguments : caller_id:int -> def:int -> bool
 end
 
-module My_showdown : sig
+module My_showdown_won : sig
   type t = { caller_id : int } [@@deriving fields]
+
+  val parse_my_showdown : Uri.t -> t option
+  val invalid_arguments : caller_id:int -> def:int -> bool
+end
+
+module My_showdown_lost : sig
+  type t =
+    { caller_id : int
+    ; pot : Card.t list
+    }
+  [@@deriving fields]
 
   val parse_my_showdown : Uri.t -> t option
   val invalid_arguments : caller_id:int -> def:int -> bool
