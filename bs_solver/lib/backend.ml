@@ -19,6 +19,14 @@ module World_state = struct
     ; last_move = None
     }
   ;;
+
+  let test_world () : t =
+    { current_game = Some (Game_state.test_game_state ())
+    ; whose_turn = Some 0
+    ; card_on_turn = Some Card.Ace
+    ; strategy = Some []
+    }
+  ;;
 end
 
 module Game_info = struct
@@ -28,7 +36,7 @@ module Game_info = struct
     ; ace_pos : int
     ; hand : Card.t list
     }
-  [@@deriving fields]
+  [@@deriving fields, sexp]
 
   let parse_game_info uri : t option =
     let open Option.Let_syntax in

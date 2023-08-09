@@ -12,6 +12,7 @@ module World_state : sig
   [@@deriving fields, sexp, jsonaf]
 
   val init : unit -> t
+  val test_world : unit -> t
 end
 
 module Game_info : sig
@@ -21,7 +22,7 @@ module Game_info : sig
     ; ace_pos : int
     ; hand : Card.t list
     }
-  [@@deriving fields]
+  [@@deriving fields, sexp]
 
   val parse_game_info : Uri.t -> t option
 
