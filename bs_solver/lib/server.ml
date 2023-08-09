@@ -1,6 +1,7 @@
 open! Core
 open Async
 module Server = Cohttp_async.Server
+open! Backend
 
 let world_state = World_state.init ()
 
@@ -13,7 +14,7 @@ let handler ~body:_ _sock req =
       (Jsonaf.to_string (world_state |> World_state.jsonaf_of_t))
       ~headers:header
   | "/create_game" ->
-    let query = Create_game.parse_query uri in
+    let query = Game_info.parse_game_info uri in
     (match query with
      | None -> Server.respond_string "Invalid arguments" ~headers:header
      | Some { num_players; my_position; ace_pos; hand } ->
@@ -32,10 +33,16 @@ let handler ~body:_ _sock req =
        world_state.whose_turn <- Some 0;
        world_state.card_on_turn <- Some Card.Ace;
        Server.respond_string "Valid Arguments")
-  | "/opponent_move" -> Server.respond_string "Opponent has made a move." ~headers:header
+  | "/opponent_move" ->
+    Server.respond_string "Opponent has made a move." ~headers:header
   | "/my_move" -> Server.respond_string "I have made a move." ~headers:header
-  | "/showdown" -> Server.respond_string "Showdown has been initiated." ~headers:header
-  | _ -> Server.respond_string ~status:`Not_found "Route not found" ~headers:header
+  | "/showdown" ->
+    Server.respond_string "Showdown has been initiated." ~headers:header
+  | _ ->
+    Server.respond_string
+      ~status:`Not_found
+      "Route not found"
+      ~headers:header
 ;;
 
 let start ~port =
