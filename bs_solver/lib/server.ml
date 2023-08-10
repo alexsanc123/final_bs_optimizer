@@ -128,19 +128,22 @@ let handler ~body:_ _sock req =
          let def = Game_state.whos_turn game in
          if def.id = game.my_id
          then (
+           print_s [%message (world_state.last_move : Card.t list option)];
            let is_lie =
              (match world_state.last_move with
               | Some cards_list -> cards_list
               | _ -> failwith "No last move")
              |> List.for_all ~f:(fun card_used ->
                   Card.equal card_used (Game_state.card_on_turn game))
+             |> not
            in
            if is_lie
-           then
-             Server.respond_string
-               "My turn showdown lost, reveal the pot"
-               ~headers:header
-           else Server.respond_string "My turn showdown won" ~headers:header)
+           then (
+             let json_string = Message.string_to_json_msg "Showdown Lost" in
+             Server.respond_string json_string ~headers:header)
+           else (
+             let json_string = Message.string_to_json_msg "Showdown Won" in
+             Server.respond_string json_string ~headers:header))
          else (
            let json_string = Message.string_to_json_msg "Showdown" in
            Server.respond_string json_string ~headers:header))
@@ -200,6 +203,7 @@ let handler ~body:_ _sock req =
            | None -> failwith "No cards"
          in
          Game_for_react.showdown ~game ~acc ~def ~pot ~cards_revealed ();
+         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
@@ -220,6 +224,7 @@ let handler ~body:_ _sock req =
        then Server.respond_string rej_json_string
        else (
          Game_for_react.showdown ~game ~acc ~def ~pot ();
+         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
@@ -240,6 +245,7 @@ let handler ~body:_ _sock req =
        then Server.respond_string rej_json_string
        else (
          Game_for_react.showdown ~game ~acc ~def ();
+         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
