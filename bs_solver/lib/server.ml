@@ -25,6 +25,7 @@ let handler ~body:_ _sock req =
       (Jsonaf.to_string (world_state |> World_state.jsonaf_of_t))
       ~headers:header
   | "/create_game" ->
+    World_state.clear world_state;
     let query = Game_info.parse_game_info uri in
     (match query with
      | None ->
@@ -43,6 +44,7 @@ let handler ~body:_ _sock req =
             ~ace_pos
        then (
          let json_string = Message.string_to_json_msg "Invalid Argument" in
+         print_endline "Invalid";
          Server.respond_string json_string ~headers:header)
        else (
          print_s [%message (game_info : Game_info.t)];

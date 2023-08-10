@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Route, Routes, useNavigate, useHistory, Redirect } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  useNavigate,
+  useHistory,
+  Redirect,
+} from "react-router-dom";
 import FetchWorld from "../FetchWorld";
+console.log("MyTurnPage Component Opened");
 
 function MyTurnPage(BrowserRouter, world_state) {
+  console.log("MyTurn function Opened")
   const [currentGame, setCurrentGame] = useState(null);
   const [playerCount, setPlayerCount] = useState(null);
   const [whoseTurn, setWhoseTurn] = useState(null);
@@ -13,29 +21,27 @@ function MyTurnPage(BrowserRouter, world_state) {
   const [allPlayers, setAllPlayers] = useState(null);
 
   function fetchGameState() {
-    setInterval(() => {
-      console.log("setInterval f");
-      return FetchWorld()
-        .then((world) => {
-          console.log("FetchWorld f");
-          const currentGame = world["current_game"];
-          setCurrentGame(currentGame);
-          setPlayerCount(currentGame["player_count"]);
-          setWhoseTurn(world["whose_turn"]);
-          setCardOnTurn(world["card_on_turn"]);
-          setRoundNum(currentGame["round_num"]);
-          setPot(currentGame["pot"]);
-          setMyId(currentGame["my_id"]);
-          setAllPlayers(currentGame["all_players"]);
-        })
-        .catch((error) => console.log(error));
-    }, 100);
+    console.log("setInterval f");
+    return FetchWorld()
+      .then((world) => {
+        console.log("FetchWorld f");
+        const tmpCurrentGame = world["current_game"];
+        setCurrentGame(tmpCurrentGame);
+        setPlayerCount(tmpCurrentGame["player_count"]);
+        setWhoseTurn(world["whose_turn"]);
+        setCardOnTurn(world["card_on_turn"]);
+        setRoundNum(tmpCurrentGame["round_num"]);
+        setPot(tmpCurrentGame["pot"]);
+        setMyId(tmpCurrentGame["my_id"]);
+        setAllPlayers(tmpCurrentGame["all_players"]);
+      })
+      .catch((error) => console.log(error));
   }
 
   useEffect(() => {
     fetchGameState();
   }, []);
-  // console.log(whoseTurn);
+  console.log(whoseTurn);
   const [numCardsPutDown, setNumCardsPutDown] = useState("");
   const [anyCalled, setAnyCalled] = useState(false);
   const [whoCalled, setWhoCalled] = useState("");
@@ -107,79 +113,86 @@ function MyTurnPage(BrowserRouter, world_state) {
       sendPotRevealedUrl();
     }
   }
+
   if (whoseTurn != myId) {
-    return <Redirect to="/OppTurnPage" />;
+    console.log("MyTurnPage Function Closed");
+
+    return <Redirect to="/oppturn" />;
+  } else {
+    console.log("MyTurnPage Function Closed");
+    return (
+      <>
+        <h1>BS Optimizer</h1>
+        <div>
+          <p> Game Log ... </p>
+
+          <p>Suggested Strategy</p>
+
+          <p>{recommendation}</p>
+        </div>
+        <div>
+          <h2>
+            It is Player {whoseTurn}'s turn to place Down A(n) {cardOnTurn}
+          </h2>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <label>Please Specify How many card we placed</label>
+          <input
+            type="text"
+            id="new-todo-input"
+            onChange={(e) => setNumCardsPutDown(e.target.value)}
+            className="input input__lg"
+            disabled={!(qImOn === 1)}
+          />
+          <p />
+          <label>Please Specify How many card we placed</label>
+          <input
+            type="text"
+            id="new-todo-input"
+            onChange={(e) => setNumCardsPutDown(e.target.value)}
+            className="input input__lg"
+            disabled={!(qImOn === 1)}
+          />
+          <p />
+          <label>Has Anyone Called?</label>
+          <input
+            type="text"
+            id="new-todo-input"
+            onChange={(e) => setAnyCalled(e.target.value)}
+            className="input input__lg"
+            disabled={!(qImOn === 1)}
+          />
+          <p />
+          <label>Please Specify who Called?</label>
+          <input
+            type="text"
+            id="new-todo-input"
+            onChange={(e) => setWhoCalled(e.target.value)}
+            className="input input__lg"
+            disabled={!(qImOn === 2)}
+          />
+          <p />
+          <label>Please Specify Pot Revealed?</label>
+          <input
+            type="text"
+            id="new-todo-input"
+            onChange={(e) => setCardsRevealed(e.target.value)}
+            className="input input__lg"
+            disabled={!(qImOn === 3)}
+          />
+          <p />
+          <button type="submit" className="btn btn__primary btn__lg">
+            submit
+          </button>
+        </form>
+
+        <div></div>
+      </>
+    );
   }
-  return (
-    <>
-      <h1>BS Optimizer</h1>
-      <div>
-        <p> Game Log ... </p>
-
-        <p>Suggested Strategy</p>
-
-        <p>{recommendation}</p>
-      </div>
-      <div>
-        <h2>
-          It is Player {whoseTurn}'s turn to place Down A(n) {cardOnTurn}
-        </h2>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <label>Please Specify How many card we placed</label>
-        <input
-          type="text"
-          id="new-todo-input"
-          onChange={(e) => setNumCardsPutDown(e.target.value)}
-          className="input input__lg"
-          disabled={!(qImOn === 1)}
-        />
-        <p />
-        <label>Please Specify How many card we placed</label>
-        <input
-          type="text"
-          id="new-todo-input"
-          onChange={(e) => setNumCardsPutDown(e.target.value)}
-          className="input input__lg"
-          disabled={!(qImOn === 1)}
-        />
-        <p />
-        <label>Has Anyone Called?</label>
-        <input
-          type="text"
-          id="new-todo-input"
-          onChange={(e) => setAnyCalled(e.target.value)}
-          className="input input__lg"
-          disabled={!(qImOn === 1)}
-        />
-        <p />
-        <label>Please Specify who Called?</label>
-        <input
-          type="text"
-          id="new-todo-input"
-          onChange={(e) => setWhoCalled(e.target.value)}
-          className="input input__lg"
-          disabled={!(qImOn === 2)}
-        />
-        <p />
-        <label>Please Specify Pot Revealed?</label>
-        <input
-          type="text"
-          id="new-todo-input"
-          onChange={(e) => setCardsRevealed(e.target.value)}
-          className="input input__lg"
-          disabled={!(qImOn === 3)}
-        />
-        <p />
-        <button type="submit" className="btn btn__primary btn__lg">
-          submit
-        </button>
-      </form>
-
-      <div></div>
-    </>
-  );
 }
+
+console.log("MyTurnPage Component Closed");
 
 export default MyTurnPage;

@@ -28,6 +28,14 @@ module World_state = struct
     ; last_move = None
     }
   ;;
+
+  let clear t =
+    t.current_game <- None;
+    t.whose_turn <- None;
+    t.card_on_turn <- None;
+    t.strategy <- None;
+    t.last_move <- None
+  ;;
 end
 
 module Game_info = struct
@@ -124,7 +132,7 @@ module My_move = struct
             ~init:[]
             cards_put_down
             ~f:(fun card_list_so_far card ->
-            Card.of_char card :: card_list_so_far)
+              Card.of_char card :: card_list_so_far)
       }
   ;;
 
@@ -160,7 +168,7 @@ module Opp_showdown = struct
             ~init:[]
             cards_revealed
             ~f:(fun card_list_so_far card ->
-            Card.of_char card :: card_list_so_far)
+              Card.of_char card :: card_list_so_far)
       }
   ;;
 

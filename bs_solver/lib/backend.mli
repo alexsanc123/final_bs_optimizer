@@ -13,6 +13,7 @@ module World_state : sig
 
   val init : unit -> t
   val test_world : unit -> t
+  val clear : t -> unit
 end
 
 module Game_info : sig
