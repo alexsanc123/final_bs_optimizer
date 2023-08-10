@@ -58,7 +58,7 @@ function MyTurnPage(BrowserRouter, world_state) {
     console.log("sendCountUri!");
     let uri =
       "http://ec2-44-208-58-34.compute-1.amazonaws.com:8181/" +
-      "my_move?num_cards=" +
+      "my_move?num_cards=" + 
       numCardsPutDown;
     fetch(uri)
       .then(function (response) {
