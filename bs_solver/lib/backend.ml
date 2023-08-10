@@ -132,7 +132,7 @@ module My_move = struct
             ~init:[]
             cards_put_down
             ~f:(fun card_list_so_far card ->
-              Card.of_char card :: card_list_so_far)
+            Card.of_char card :: card_list_so_far)
       }
   ;;
 
@@ -168,7 +168,7 @@ module Opp_showdown = struct
             ~init:[]
             cards_revealed
             ~f:(fun card_list_so_far card ->
-              Card.of_char card :: card_list_so_far)
+            Card.of_char card :: card_list_so_far)
       }
   ;;
 
@@ -207,4 +207,18 @@ module My_showdown_lost = struct
   ;;
 
   let invalid_arguments ~(caller_id : int) ~(def : int) = caller_id = def
+end
+
+module Reveal_pot = struct
+  type t = { pot : Card.t list } [@@deriving fields]
+
+  let parse_pot uri : t option =
+    let open Option.Let_syntax in
+    let%bind pot = Uri.get_query_param uri "pot" in
+    Some
+      { pot =
+          String.fold ~init:[] pot ~f:(fun card_list_so_far card ->
+            card_list_so_far @ [ Card.of_char card ])
+      }
+  ;;
 end

@@ -93,3 +93,9 @@ module My_showdown_lost : sig
   val parse_my_showdown : Uri.t -> t option
   val invalid_arguments : caller_id:int -> def:int -> bool
 end
+
+module Reveal_pot : sig
+  type t = { pot : Card.t list } [@@deriving fields]
+
+  val parse_pot : Uri.t -> t option
+end
