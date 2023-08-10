@@ -91,12 +91,6 @@ function OppTurnPage() {
             whoCalledRef.current.value = "";
             cardsRevealedRef.current.value = "";
             potRevealedRef.current.value = "";
-
-            setNumCardsPutDown("");
-            setAnyCalled("");
-            setWhoCalled("");
-            setRecommendation("No Recommendation Available");
-            setQImOn(1);
           }
         })
         .catch((error) => console.error(error));
@@ -130,11 +124,6 @@ function OppTurnPage() {
             whoCalledRef.current.value = "";
             cardsRevealedRef.current.value = "";
             potRevealedRef.current.value = "";
-            setNumCardsPutDown("");
-            setAnyCalled("");
-            setWhoCalled("");
-            setRecommendation("No Recommendation Available");
-            setQImOn(1);
           }
         })
         .catch((error) => console.error(error));
@@ -159,11 +148,6 @@ function OppTurnPage() {
             whoCalledRef.current.value = "";
             cardsRevealedRef.current.value = "";
             potRevealedRef.current.value = "";
-            setQImOn(1);
-            setNumCardsPutDown("");
-            setAnyCalled("");
-            setWhoCalled("");
-            setRecommendation("No Recommendation Available");
           }
         })
         .catch((error) => console.error(error));
@@ -197,8 +181,6 @@ function OppTurnPage() {
           <h1>BS Optimizer</h1>
           <div>
             <p> Game Log ... </p>
-
-            <p>Suggested Strategy</p>
 
             <p>{recommendation}</p>
           </div>

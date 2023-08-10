@@ -65,7 +65,9 @@ let handler ~body:_ _sock req =
          world_state.whose_turn <- Some 0;
          world_state.card_on_turn <- Some Card.Ace;
          world_state.strategy <- Some strategy;
-         Server.respond_string ack_json_string ~headers:header))
+         print_s[%message (world_state:World_state.t)];
+         Server.respond_string ack_json_string ~headers:header
+         ))
   | "/opponent_move" ->
     let query = Opponent_move.parse_opp_move uri in
     (match query with

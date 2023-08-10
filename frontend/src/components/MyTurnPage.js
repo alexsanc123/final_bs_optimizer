@@ -38,6 +38,7 @@ function MyTurnPage() {
   } else {
     const currentGame = world["current_game"];
     // const playerCount = currentGame["player_count"];
+    const strategy = world["strategy"];
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
     // const roundNum = currentGame["round_num"];
@@ -204,6 +205,7 @@ function MyTurnPage() {
         }
       }
     }
+    console.log(strategy);
     if (whoseTurn !== myId) {
       // console.log("OppTurn Function Closed");
       return <Redirect to="/oppturn" />;
@@ -215,9 +217,7 @@ function MyTurnPage() {
           <div>
             <p> Game Log ... </p>
 
-            <p>Suggested Strategy</p>
-
-            <p>{recommendation}</p>
+            <p>Suggested Strategy: {strategy}</p>
           </div>
           <div>
             <h2>It is Our turn to place Down A(n) {cardOnTurn}</h2>
