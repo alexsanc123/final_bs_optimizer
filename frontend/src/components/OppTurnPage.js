@@ -3,7 +3,7 @@ import { Redirect } from "react-router-dom";
 import FetchWorld from "../FetchWorld";
 
 function OppTurnPage() {
-  console.log("OppTurn Function Opened");
+  // console.log("OppTurn Function Opened");
 
   const [world, setWorld] = useState(null);
 
@@ -45,7 +45,6 @@ function OppTurnPage() {
     const allPlayers = currentGame["all_players"];
 
     function sendCountUri() {
-      
       let uri =
         "http://localhost:8181/" + "opponent_move?num_cards=" + numCardsPutDown;
       fetch(uri)
@@ -57,7 +56,9 @@ function OppTurnPage() {
           const resp = data["message"];
           console.log(resp);
           if (resp === "Rej") {
+            `1`
           } else {
+            setRecommendation(resp);
             setQImOn(qImOn + 1);
           }
         })
@@ -66,7 +67,8 @@ function OppTurnPage() {
 
     function sendAnyCalledUrl() {
       console.log("sendAnyCalledUrl!");
-      let uri = "http://localhost:8181/" + "check_bluff?bluff_called=" + anyCalled;
+      let uri =
+        "http://localhost:8181/" + "check_bluff?bluff_called=" + anyCalled;
       fetch(uri)
         .then(function (response) {
           return response.json();
@@ -74,11 +76,11 @@ function OppTurnPage() {
         .then((data) => {
           const resp = data["message"];
           console.log(resp);
-          if (resp === "Rej") {
-          }
-          if (resp === "Ack") {
+          if (resp === "Showdown") {
             setQImOn(qImOn + 1);
-          } else {
+
+          }
+          if (resp === "No Showdown") {
             console.log("Refresh page");
             setNumCardsPutDown("");
             setAnyCalled("");
@@ -90,36 +92,14 @@ function OppTurnPage() {
         .catch((error) => console.error(error));
     }
 
-    function sendWhoCalledUrl() {
+    function sendWhoCalledAndCardsRevealed() {
       console.log("sendWhoCalledUrl!");
-      let uri = "http://localhost:8181/" + "opp_showdown?caller_id=" + whoCalled;
-      fetch(uri)
-        .then(function (response) {
-          return response.json();
-        })
-        .then((data) => {
-          const resp = data["message"];
-          console.log(resp);
-          // fix
-          if (resp === "Rej") {
-          }
-          if (resp === "Ack") {
-            setQImOn(qImOn + 1);
-          } else {
-            setQImOn(1);
-            setNumCardsPutDown("");
-            setAnyCalled("");
-            setWhoCalled("");
-            setRecommendation("No Recommendation Available");
-          }
-        })
-        .catch((error) => console.error(error));
-    }
-
-    function sendCardsRevealedUrl() {
-      console.log("sendCardsRevealedUrl!");
       let uri =
-        "http://localhost:8181/" + "cards_revealed?cards_revealed=" + cardsRevealed;
+        "http://localhost:8181/" +
+        "opp_showdown?caller_id=" +
+        whoCalled +
+        "&cards_revealed?cards_revealed=" +
+        cardsRevealed;
       fetch(uri)
         .then(function (response) {
           return response.json();
@@ -176,9 +156,7 @@ function OppTurnPage() {
         sendAnyCalledUrl();
       }
       if (qImOn === 3) {
-        sendWhoCalledUrl();
-        sendCardsRevealedUrl();
-
+        sendWhoCalledAndCardsRevealed();
       }
       if (qImOn === 4) {
         sendPotRevealedUrl();
@@ -186,10 +164,10 @@ function OppTurnPage() {
     }
 
     if (whoseTurn === myId) {
-      console.log("OppTurn Function Closed");
+      // console.log("OppTurn Function Closed");
       return <Redirect to="/myturn" />;
     } else {
-      console.log("OppTurn Function Closed");
+      // console.log("OppTurn Function Closed");
       return (
         <>
           <h1>BS Optimizer</h1>

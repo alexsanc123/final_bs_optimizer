@@ -90,7 +90,7 @@ let handler ~body:_ _sock req =
          Game_for_react.opp_moves game ~num_cards;
          world_state.current_game <- Some game;
          let json_string = Message.string_to_json_msg reccomendation in
-         print_endline "Invalid";
+         print_endline "Working";
          Server.respond_string json_string ~headers:header))
   | "/my_move" ->
     let query = My_move.parse_my_move uri in
@@ -141,8 +141,9 @@ let handler ~body:_ _sock req =
                ~headers:header
            else Server.respond_string "My showdown won" ~headers:header)
          else
+          let json_string = Message.string_to_json_msg "Showdown" in
            Server.respond_string
-             "A showdown has been initiated"
+             json_string
              ~headers:header)
        else (
          game.round_num <- game.round_num + 1;
