@@ -124,7 +124,7 @@ function OppTurnPage() {
 
     function sendPotRevealedUrl() {
       console.log("sendPotRevealedUrl!");
-      let uri = "http://localhost:8181/" + "pot?pot=" + potRevealed;
+      let uri = "http://localhost:8181/" + "reveal_pot?pot=" + potRevealed;
       fetch(uri)
         .then(function (response) {
           return response.json();
