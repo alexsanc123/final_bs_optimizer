@@ -66,7 +66,7 @@ function OppTurnPage() {
 
     function sendAnyCalledUrl() {
       console.log("sendAnyCalledUrl!");
-      let uri = "http://localhost:8181/" + "any_calls?any_calls=" + anyCalled;
+      let uri = "http://localhost:8181/" + "check_bluff?bluff_called=" + anyCalled;
       fetch(uri)
         .then(function (response) {
           return response.json();
@@ -91,7 +91,7 @@ function OppTurnPage() {
 
     function sendWhoCalledUrl() {
       console.log("sendWhoCalledUrl!");
-      let uri = "http://localhost:8181/" + "who_called?who_called=" + whoCalled;
+      let uri = "http://localhost:8181/" + "opp_showdown?caller_id=" + whoCalled;
       fetch(uri)
         .then(function (response) {
           return response.json();
@@ -117,7 +117,7 @@ function OppTurnPage() {
     function sendCardsRevealedUrl() {
       console.log("sendCardsRevealedUrl!");
       let uri =
-        "http://localhost:8181/" + "cards_revealed?cards=" + cardsRevealed;
+        "http://localhost:8181/" + "cards_revealed?cards_revealed=" + cardsRevealed;
       fetch(uri)
         .then(function (response) {
           return response.json();
@@ -142,7 +142,7 @@ function OppTurnPage() {
 
     function sendPotRevealedUrl() {
       console.log("sendPotRevealedUrl!");
-      let uri = "http://localhost:8181/" + "pot_revealed?pot=" + potRevealed;
+      let uri = "http://localhost:8181/" + "pot?pot=" + potRevealed;
       fetch(uri)
         .then(function (response) {
           return response.json();
