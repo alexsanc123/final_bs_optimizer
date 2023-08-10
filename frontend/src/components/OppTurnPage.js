@@ -18,7 +18,6 @@ function OppTurnPage() {
   const [qImOn, setQImOn] = useState(1);
   const [potRevealed, setPotRevealed] = useState(null);
 
-  const [showdown, setShowdown] = useState(false);
   FetchWorld()
     .then((newWorld) => {
       if (newWorld === world) {
@@ -36,13 +35,13 @@ function OppTurnPage() {
     );
   } else {
     const currentGame = world["current_game"];
-    const playerCount = currentGame["player_count"];
+    // const playerCount = currentGame["player_count"];
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
-    const roundNum = currentGame["round_num"];
-    const pot = currentGame["pot"];
+    // const roundNum = currentGame["round_num"];
+    // const pot = currentGame["pot"];
     const myId = currentGame["my_id"];
-    const allPlayers = currentGame["all_players"];
+    // const allPlayers = currentGame["all_players"];
 
     function sendCountUri() {
       let uri =
@@ -110,7 +109,7 @@ function OppTurnPage() {
           }
           if (resp === "Reveal Pot") {
             setQImOn(qImOn + 1);
-          } 
+          }
           if (resp === "Next Turn") {
             setQImOn(1);
             setNumCardsPutDown("");
@@ -133,7 +132,8 @@ function OppTurnPage() {
           const resp = data["message"];
           console.log(resp);
           if (resp === "Rej") {
-          } else {
+          }
+          if (resp == "Ack") {
             setQImOn(1);
             setNumCardsPutDown("");
             setAnyCalled("");
@@ -224,7 +224,7 @@ function OppTurnPage() {
             <input
               type="text"
               id="new-todo-input"
-              onChange={(e) => setCardsRevealed(e.target.value)}
+              onChange={(e) => setPotRevealed(e.target.value)}
               className="input input__lg"
               disabled={!(qImOn === 4)}
             />
