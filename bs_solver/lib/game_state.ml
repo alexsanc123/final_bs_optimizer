@@ -74,11 +74,16 @@ let clear_cards_after_showdown t ~(exclude : int list) =
     else My_cards.clear_cards ~player)
 ;;
 
+let find_true_pos ~ace_pos ~pos ~player_count =
+  (pos - ace_pos) % player_count
+;;
+
 let test_game_state () =
   (*we dont know the position until the person with the ace of spades has
     acted*)
   let player_count = 5 in
   let my_pos = 1 in
+  let ace_pos = 0 in
   let my_cards = My_cards.init () in
   List.iter
     [ Card.Ace
@@ -96,17 +101,18 @@ let test_game_state () =
     ~f:(fun card -> My_cards.add_card my_cards ~card);
   let all_players = Int.Table.create () in
   let _ =
-    List.init player_count ~f:(fun player_id ->
+    List.init player_count ~f:(fun id_r_dealer ->
       let cards =
-        if my_pos = player_id then my_cards else My_cards.init ()
+        if my_pos = id_r_dealer then my_cards else My_cards.init ()
       in
+      let true_pos = find_true_pos ~ace_pos ~pos:id_r_dealer ~player_count in
       Hashtbl.set
         all_players
-        ~key:player_id
+        ~key:true_pos
         ~data:
-          { Player.id = player_id
+          { Player.id = id_r_dealer
           ; hand_size =
-              (if player_id < 52 % player_count
+              (if id_r_dealer < 52 % player_count
                then (52 / player_count) + 1
                else 52 / player_count)
           ; bluffs = 0
