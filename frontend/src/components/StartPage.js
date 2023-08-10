@@ -7,9 +7,9 @@ console.log("StartPage component opened")
 
 function StartPage(BrowserRouter, world_state) {
   const [input1, setInput1] = useState("5");
-  const [input2, setInput2] = useState("2");
-  const [input3, setInput3] = useState("1");
-  const [input4, setInput4] = useState("123456789t");
+  const [input2, setInput2] = useState("1");
+  const [input3, setInput3] = useState("0");
+  const [input4, setInput4] = useState("11246tq6735");
   const [data, setData] = useState(null);
   const [shouldISwitch, setShouldISwitch] = useState(false);
 

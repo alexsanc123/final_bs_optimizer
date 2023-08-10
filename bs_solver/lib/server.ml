@@ -83,12 +83,12 @@ let handler ~body:_ _sock req =
          in
          let player = Game_state.whos_turn game in
          let card = Game_state.card_on_turn game in
+         Game_for_react.opp_moves game ~num_cards;
          let reccomendation =
            Game_for_react.bluff_recomendation
              ~game
              ~claim:(player.id, card, num_cards)
          in
-         Game_for_react.opp_moves game ~num_cards;
          world_state.current_game <- Some game;
          let json_string = Message.string_to_json_msg reccomendation in
          print_endline "Working";

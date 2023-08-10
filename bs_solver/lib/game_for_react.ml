@@ -20,19 +20,19 @@ let game_init
   let my_cards = declare_my_cards ~hand in
   let all = Int.Table.create () in
   let _ =
-    List.init num_players ~f:(fun player_id ->
+    List.init num_players ~f:(fun id_r_dealer ->
       assert (num_players > 3);
       let cards =
-        if my_pos = player_id then my_cards else My_cards.init ()
+        if my_pos = id_r_dealer then my_cards else My_cards.init ()
       in
-      let true_pos = find_true_pos ~pos:player_id ~ace_pos ~num_players in
+      let true_pos = find_true_pos ~pos:id_r_dealer ~ace_pos ~num_players in
       Hashtbl.set
         all
         ~key:true_pos
         ~data:
           { Player.id = true_pos
           ; hand_size =
-              (if my_pos < 52 % num_players
+              (if id_r_dealer < 52 % num_players
                then (52 / num_players) + 1
                else 52 / num_players)
           ; bluffs = 0
