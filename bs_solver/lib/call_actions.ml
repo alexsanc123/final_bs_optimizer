@@ -185,6 +185,7 @@ let assess_bluff ~(game_state : Game_state.t) ~(claim : int * Card.t * int) =
         ~significant_digits:3
         ((1. -. probability) *. 100.0)
     in
+    print_s [%message "Prob that player is lyying" (prob_of_lie : float)];
     Float.( >. ) prob_of_lie 75.0)
 ;;
 

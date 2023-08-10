@@ -21,9 +21,7 @@ function StartPage(BrowserRouter, world_state) {
     // const hostname = "ec2-44-208-58-34.compute-1.amazonaws.com;
 
     let uri =
-      "http://" +
-      "localhost"
-      + ":8181/" +
+      "http://localhost:8181/" +
       "create_game?num_players=" +
       input1 +
       "&my_position=" +

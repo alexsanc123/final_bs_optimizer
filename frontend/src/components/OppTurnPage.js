@@ -56,7 +56,6 @@ function OppTurnPage() {
           const resp = data["message"];
           console.log(resp);
           if (resp === "Rej") {
-            `1`
           } else {
             setRecommendation(resp);
             setQImOn(qImOn + 1);
@@ -78,7 +77,6 @@ function OppTurnPage() {
           console.log(resp);
           if (resp === "Showdown") {
             setQImOn(qImOn + 1);
-
           }
           if (resp === "No Showdown") {
             console.log("Refresh page");
@@ -98,7 +96,7 @@ function OppTurnPage() {
         "http://localhost:8181/" +
         "opp_showdown?caller_id=" +
         whoCalled +
-        "&cards_revealed?cards_revealed=" +
+        "&cards_revealed=" +
         cardsRevealed;
       fetch(uri)
         .then(function (response) {
@@ -110,9 +108,10 @@ function OppTurnPage() {
           // fix
           if (resp === "Rej") {
           }
-          if (resp === "Ack") {
+          if (resp === "Reveal Pot") {
             setQImOn(qImOn + 1);
-          } else {
+          } 
+          if (resp === "Next Turn") {
             setQImOn(1);
             setNumCardsPutDown("");
             setAnyCalled("");

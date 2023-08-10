@@ -150,7 +150,8 @@ let handler ~body:_ _sock req =
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
-         Server.respond_string "Move on to the next turn" ~headers:header))
+         let json_string = Message.string_to_json_msg "No Showdown" in
+         Server.respond_string json_string ~headers:header))
   | "/opp_showdown" ->
     let query = Opp_showdown.parse_opp_showdown uri in
     (match query with
