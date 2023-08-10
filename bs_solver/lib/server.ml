@@ -16,6 +16,9 @@ end
 let world_state = World_state.init ()
 (* let world_state = World_state.test_world () *)
 
+let ack_json_string = Message.string_to_json_msg "Ack"
+let rej_json_string = Message.string_to_json_msg "Rej"
+
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   let header = Cohttp.Header.init_with "Access-Control-Allow-Origin" "*" in
@@ -28,11 +31,7 @@ let handler ~body:_ _sock req =
     World_state.clear world_state;
     let query = Game_info.parse_game_info uri in
     (match query with
-     | None ->
-       let message = { Message.message = "No game created." } in
-       Server.respond_string
-         (Jsonaf.to_string (message |> Message.jsonaf_of_t))
-         ~headers:header
+     | None -> Server.respond_string rej_json_string ~headers:header
      | Some { num_players; my_position; ace_pos; hand } ->
        let game_info =
          { Game_info.num_players; my_position; ace_pos; hand }
@@ -43,9 +42,8 @@ let handler ~body:_ _sock req =
             ~hand
             ~ace_pos
        then (
-         let json_string = Message.string_to_json_msg "Invalid Argument" in
          print_endline "Invalid";
-         Server.respond_string json_string ~headers:header)
+         Server.respond_string rej_json_string ~headers:header)
        else (
          print_s [%message (game_info : Game_info.t)];
          let my_true_pos = (my_position - ace_pos) % num_players in
@@ -66,17 +64,16 @@ let handler ~body:_ _sock req =
          world_state.whose_turn <- Some 0;
          world_state.card_on_turn <- Some Card.Ace;
          world_state.strategy <- Some strategy;
-         let json_string = Message.string_to_json_msg "Game created" in
-         print_endline json_string;
-         Server.respond_string json_string ~headers:header))
+         Server.respond_string ack_json_string ~headers:header))
   | "/opponent_move" ->
     let query = Opponent_move.parse_opp_move uri in
     (match query with
-     | None ->
-       Server.respond_string "Opp hasnt made a move yet." ~headers:header
+     | None -> Server.respond_string rej_json_string ~headers:header
      | Some { num_cards } ->
        if Opponent_move.invalid_arguments ~num_cards
-       then Server.respond_string "Invalid arguments"
+       then (
+         print_endline "Invalid";
+         Server.respond_string rej_json_string ~headers:header)
        else (
          let game =
            match world_state.current_game with
@@ -92,12 +89,13 @@ let handler ~body:_ _sock req =
          in
          Game_for_react.opp_moves game ~num_cards;
          world_state.current_game <- Some game;
-         Server.respond_string reccomendation ~headers:header))
+         let json_string = Message.string_to_json_msg reccomendation in
+         print_endline "Invalid";
+         Server.respond_string json_string ~headers:header))
   | "/my_move" ->
     let query = My_move.parse_my_move uri in
     (match query with
-     | None ->
-       Server.respond_string "I have not made a move yet." ~headers:header
+     | None -> Server.respond_string rej_json_string ~headers:header
      | Some { num_cards; cards_put_down } ->
        let game =
          match World_state.current_game world_state with
@@ -105,19 +103,19 @@ let handler ~body:_ _sock req =
          | _ -> failwith "Invalid game"
        in
        if My_move.invalid_arguments ~game ~num_cards ~cards_put_down
-       then Server.respond_string "Invalid arguments"
+       then (
+         print_endline "Invalid";
+         Server.respond_string rej_json_string ~headers:header)
        else (
          Game_for_react.my_moves game ~num_cards ~cards_put_down;
          world_state.current_game <- Some game;
          world_state.last_move <- Some cards_put_down;
-         Server.respond_string "I have made a move." ~headers:header))
+         print_endline "Move Made";
+         Server.respond_string ack_json_string ~headers:header))
   | "/check_bluff" ->
     let query = Bluff_check.parse_bluff uri in
     (match query with
-     | None ->
-       Server.respond_string
-         "Showdown has not been threatened"
-         ~headers:header
+     | None -> Server.respond_string rej_json_string ~headers:header
      | Some { bluff_called } ->
        let game =
          match World_state.current_game world_state with
@@ -155,8 +153,7 @@ let handler ~body:_ _sock req =
   | "/opp_showdown" ->
     let query = Opp_showdown.parse_opp_showdown uri in
     (match query with
-     | None ->
-       Server.respond_string "Showdown info not received" ~headers:header
+     | None -> Server.respond_string rej_json_string ~headers:header
      | Some { caller_id; cards_revealed } ->
        let game =
          match World_state.current_game world_state with
@@ -166,21 +163,18 @@ let handler ~body:_ _sock req =
        let acc = Hashtbl.find_exn game.all_players caller_id in
        let def = Game_state.whos_turn game in
        if Opp_showdown.invalid_arguments ~caller_id ~def:def.id
-       then Server.respond_string "Invalid arguments"
+       then Server.respond_string rej_json_string
        else (
          Game_for_react.showdown ~game ~acc ~def ~cards_revealed ();
          game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
-         Server.respond_string
-           "Opponent showdown has been completed."
-           ~headers:header))
+         Server.respond_string ack_json_string ~headers:header))
   | "/my_showdown_lost" ->
     let query = My_showdown_lost.parse_my_showdown uri in
     (match query with
-     | None ->
-       Server.respond_string "Showdown info not received" ~headers:header
+     | None -> Server.respond_string rej_json_string ~headers:header
      | Some { caller_id; pot } ->
        let game =
          match World_state.current_game world_state with
@@ -190,16 +184,15 @@ let handler ~body:_ _sock req =
        let acc = Hashtbl.find_exn game.all_players caller_id in
        let def = Hashtbl.find_exn game.all_players game.my_id in
        if Opp_showdown.invalid_arguments ~caller_id ~def:def.id
-       then Server.respond_string "Invalid arguments"
+       then Server.respond_string rej_json_string
        else (
          Game_for_react.showdown ~game ~acc ~def ~pot ();
          world_state.current_game <- Some game;
-         Server.respond_string "Showdown has been completed" ~headers:header))
+         Server.respond_string ack_json_string ~headers:header))
   | "/my_showdown_won" ->
     let query = My_showdown_won.parse_my_showdown uri in
     (match query with
-     | None ->
-       Server.respond_string "Showdown info not received" ~headers:header
+     | None -> Server.respond_string rej_json_string ~headers:header
      | Some { caller_id } ->
        let game =
          match World_state.current_game world_state with
@@ -209,16 +202,13 @@ let handler ~body:_ _sock req =
        let acc = Hashtbl.find_exn game.all_players caller_id in
        let def = Hashtbl.find_exn game.all_players game.my_id in
        if Opp_showdown.invalid_arguments ~caller_id ~def:def.id
-       then Server.respond_string "Invalid arguments"
+       then Server.respond_string rej_json_string
        else (
          Game_for_react.showdown ~game ~acc ~def ();
          world_state.current_game <- Some game;
-         Server.respond_string "Showdown has been completed" ~headers:header))
+         Server.respond_string ack_json_string ~headers:header))
   | _ ->
-    Server.respond_string
-      ~status:`Not_found
-      "Route not found"
-      ~headers:header
+    Server.respond_string ~status:`Not_found rej_json_string ~headers:header
 ;;
 
 let start ~port =

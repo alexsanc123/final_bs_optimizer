@@ -57,16 +57,17 @@ function MyTurnPage(BrowserRouter, world_state) {
   function sendCountUri() {
     console.log("sendCountUri!");
     let uri =
-      "http://ec2-44-208-58-34.compute-1.amazonaws.com:8181/" +
-      "my_move?num_cards=" + 
+      "http://localhost:8181/" +
+      "my_move?num_cards=" +
       numCardsPutDown;
     fetch(uri)
       .then(function (response) {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
-        if (data === "Invalid arguments") {
+        const resp = data["message"];
+        console.log(resp);
+        if (resp === "Rej") {
         } else {
           setQImOn(qImOn + 1);
 
