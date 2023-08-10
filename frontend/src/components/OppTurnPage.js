@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Redirect } from "react-router-dom";
 import FetchWorld from "../FetchWorld";
 
@@ -17,6 +17,12 @@ function OppTurnPage() {
 
   const [qImOn, setQImOn] = useState(1);
   const [potRevealed, setPotRevealed] = useState(null);
+
+  const numCardsPlacedRef = useRef("");
+  const anyoneCalledRef = useRef("");
+  const whoCalledRef = useRef("");
+  const cardsRevealedRef = useRef("");
+  const potRevealedRef = useRef("");
 
   FetchWorld()
     .then((newWorld) => {
@@ -79,6 +85,13 @@ function OppTurnPage() {
           }
           if (resp === "No Showdown") {
             console.log("Refresh page");
+
+            numCardsPlacedRef.current.value = "";
+            anyoneCalledRef.current.value = "";
+            whoCalledRef.current.value = "";
+            cardsRevealedRef.current.value = "";
+            potRevealedRef.current.value = "";
+
             setNumCardsPutDown("");
             setAnyCalled("");
             setWhoCalled("");
@@ -111,11 +124,17 @@ function OppTurnPage() {
             setQImOn(qImOn + 1);
           }
           if (resp === "Next Turn") {
-            setQImOn(1);
+            console.log("AACKKKKK");
+            numCardsPlacedRef.current.value = "";
+            anyoneCalledRef.current.value = "";
+            whoCalledRef.current.value = "";
+            cardsRevealedRef.current.value = "";
+            potRevealedRef.current.value = "";
             setNumCardsPutDown("");
             setAnyCalled("");
             setWhoCalled("");
             setRecommendation("No Recommendation Available");
+            setQImOn(1);
           }
         })
         .catch((error) => console.error(error));
@@ -134,6 +153,12 @@ function OppTurnPage() {
           if (resp === "Rej") {
           }
           if (resp == "Ack") {
+            console.log("AACKKKKK");
+            numCardsPlacedRef.current.value = "";
+            anyoneCalledRef.current.value = "";
+            whoCalledRef.current.value = "";
+            cardsRevealedRef.current.value = "";
+            potRevealedRef.current.value = "";
             setQImOn(1);
             setNumCardsPutDown("");
             setAnyCalled("");
@@ -190,6 +215,7 @@ function OppTurnPage() {
               id="new-todo-input"
               onChange={(e) => setNumCardsPutDown(e.target.value)}
               className="input input__lg"
+              ref={numCardsPlacedRef}
               disabled={!(qImOn === 1)}
             />
             <p />
@@ -199,6 +225,7 @@ function OppTurnPage() {
               id="new-todo-input"
               onChange={(e) => setAnyCalled(e.target.value)}
               className="input input__lg"
+              ref={anyoneCalledRef}
               disabled={!(qImOn === 2)}
             />
             <p />
@@ -208,6 +235,7 @@ function OppTurnPage() {
               id="new-todo-input"
               onChange={(e) => setWhoCalled(e.target.value)}
               className="input input__lg"
+              ref={whoCalledRef}
               disabled={!(qImOn === 3)}
             />
             <p />
@@ -217,6 +245,7 @@ function OppTurnPage() {
               id="new-todo-input"
               onChange={(e) => setCardsRevealed(e.target.value)}
               className="input input__lg"
+              ref={cardsRevealedRef}
               disabled={!(qImOn === 3)}
             />
             <p />
@@ -226,6 +255,7 @@ function OppTurnPage() {
               id="new-todo-input"
               onChange={(e) => setPotRevealed(e.target.value)}
               className="input input__lg"
+              ref={potRevealedRef}
               disabled={!(qImOn === 4)}
             />
             <p />

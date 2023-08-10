@@ -134,7 +134,7 @@ let handler ~body:_ _sock req =
               | Some cards_list -> cards_list
               | _ -> failwith "No last move")
              |> List.for_all ~f:(fun card_used ->
-                  Card.equal card_used (Game_state.card_on_turn game))
+               Card.equal card_used (Game_state.card_on_turn game))
              |> not
            in
            if is_lie
@@ -170,7 +170,7 @@ let handler ~body:_ _sock req =
        then Server.respond_string rej_json_string
        else if caller_id = game.my_id
                && List.for_all cards_revealed ~f:(fun card ->
-                    Card.equal card (Game_state.card_on_turn game))
+                 Card.equal card (Game_state.card_on_turn game))
        then (
          world_state.last_move <- Some cards_revealed;
          let json_string = Message.string_to_json_msg "Reveal pot" in
@@ -181,7 +181,8 @@ let handler ~body:_ _sock req =
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
-         Server.respond_string ack_json_string ~headers:header))
+         let json_string = Message.string_to_json_msg "Next Turn" in
+         Server.respond_string json_string ~headers:header))
   | "/reveal_pot" ->
     let query = Reveal_pot.parse_pot uri in
     (match query with
