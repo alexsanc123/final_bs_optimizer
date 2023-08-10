@@ -38,7 +38,10 @@ function MyTurnPage() {
   } else {
     const currentGame = world["current_game"];
     // const playerCount = currentGame["player_count"];
-    const strategy = world["strategy"];
+    const strategy = world["strategy"].map(
+      ([cardToProvide, ...cardsRecommended]) =>
+        cardToProvide + "-(" + cardsRecommended + ");  "
+    );
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
     // const roundNum = currentGame["round_num"];
@@ -205,7 +208,6 @@ function MyTurnPage() {
         }
       }
     }
-    console.log(strategy);
     if (whoseTurn !== myId) {
       // console.log("OppTurn Function Closed");
       return <Redirect to="/oppturn" />;
