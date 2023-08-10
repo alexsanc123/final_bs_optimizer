@@ -14,6 +14,7 @@ module Message = struct
 end
 
 let world_state = World_state.init ()
+
 (* let world_state = World_state.test_world () *)
 
 let ack_json_string = Message.string_to_json_msg "Ack"
@@ -137,14 +138,12 @@ let handler ~body:_ _sock req =
            if is_lie
            then
              Server.respond_string
-               "My showdown lost, reveal the pot"
+               "My turn showdown lost, reveal the pot"
                ~headers:header
-           else Server.respond_string "My showdown won" ~headers:header)
-         else
-          let json_string = Message.string_to_json_msg "Showdown" in
-           Server.respond_string
-             json_string
-             ~headers:header)
+           else Server.respond_string "My turn showdown won" ~headers:header)
+         else (
+           let json_string = Message.string_to_json_msg "Showdown" in
+           Server.respond_string json_string ~headers:header))
        else (
          game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
@@ -166,9 +165,41 @@ let handler ~body:_ _sock req =
        let def = Game_state.whos_turn game in
        if Opp_showdown.invalid_arguments ~caller_id ~def:def.id
        then Server.respond_string rej_json_string
+       else if caller_id = game.my_id
+               && List.for_all cards_revealed ~f:(fun card ->
+                    Card.equal card (Game_state.card_on_turn game))
+       then (
+         world_state.last_move <- Some cards_revealed;
+         let json_string = Message.string_to_json_msg "Reveal pot" in
+         Server.respond_string json_string ~headers:header)
        else (
          Game_for_react.showdown ~game ~acc ~def ~cards_revealed ();
          game.round_num <- game.round_num + 1;
+         world_state.current_game <- Some game;
+         world_state.whose_turn <- Some (Game_state.whos_turn game).id;
+         world_state.card_on_turn <- Some (Game_state.card_on_turn game);
+         Server.respond_string ack_json_string ~headers:header))
+  | "/reveal_pot" ->
+    let query = Reveal_pot.parse_pot uri in
+    (match query with
+     | None -> Server.respond_string rej_json_string ~headers:header
+     | Some { pot } ->
+       let game =
+         match World_state.current_game world_state with
+         | Some game_state -> game_state
+         | _ -> failwith "Invalid game"
+       in
+       let acc = Hashtbl.find_exn game.all_players game.my_id in
+       let def = Game_state.whos_turn game in
+       if Opp_showdown.invalid_arguments ~caller_id:acc.id ~def:def.id
+       then Server.respond_string rej_json_string
+       else (
+         let cards_revealed =
+           match world_state.last_move with
+           | Some cards -> cards
+           | None -> failwith "No cards"
+         in
+         Game_for_react.showdown ~game ~acc ~def ~pot ~cards_revealed ();
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
@@ -190,6 +221,8 @@ let handler ~body:_ _sock req =
        else (
          Game_for_react.showdown ~game ~acc ~def ~pot ();
          world_state.current_game <- Some game;
+         world_state.whose_turn <- Some (Game_state.whos_turn game).id;
+         world_state.card_on_turn <- Some (Game_state.card_on_turn game);
          Server.respond_string ack_json_string ~headers:header))
   | "/my_showdown_won" ->
     let query = My_showdown_won.parse_my_showdown uri in
@@ -208,6 +241,8 @@ let handler ~body:_ _sock req =
        else (
          Game_for_react.showdown ~game ~acc ~def ();
          world_state.current_game <- Some game;
+         world_state.whose_turn <- Some (Game_state.whos_turn game).id;
+         world_state.card_on_turn <- Some (Game_state.card_on_turn game);
          Server.respond_string ack_json_string ~headers:header))
   | _ ->
     Server.respond_string ~status:`Not_found rej_json_string ~headers:header
