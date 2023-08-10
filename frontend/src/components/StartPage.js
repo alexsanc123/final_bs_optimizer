@@ -38,17 +38,17 @@ function StartPage(BrowserRouter, world_state) {
         return response.json();
       })
       .then((data) => {
-        const ack = data["message"];
-        console.log(ack);
+        const resp = data["message"];
+        console.log(resp);
 
-        if (ack === "Invalid arguments") {
+        if (resp === "Rej") {
           console.log("BAD INPUT");
           setInput1("");
           setInput2("");
           setInput3("");
           setInput4("");
         }
-        if (ack === "Game created") {
+        if (resp === "Ack") {
           setData(data);
           console.log(data);
           setShouldISwitch(true);

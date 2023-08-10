@@ -19,7 +19,6 @@ function OppTurnPage() {
   const [potRevealed, setPotRevealed] = useState(null);
 
   const [showdown, setShowdown] = useState(false);
-
   FetchWorld()
     .then((newWorld) => {
       if (newWorld === world) {
@@ -46,17 +45,18 @@ function OppTurnPage() {
     const allPlayers = currentGame["all_players"];
 
     function sendCountUri() {
-      console.log("sendCountUri!");
+      
       let uri =
         "http://localhost:8181/" + "opponent_move?num_cards=" + numCardsPutDown;
       fetch(uri)
         .then(function (response) {
+          console.log("sendCountUri!");
           return response.json();
         })
         .then((data) => {
-          const ack = data["message"];
-          console.log(ack);
-          if (ack === "Invalid arguments") {
+          const resp = data["message"];
+          console.log(resp);
+          if (resp === "Rej") {
           } else {
             setQImOn(qImOn + 1);
           }
@@ -72,18 +72,19 @@ function OppTurnPage() {
           return response.json();
         })
         .then((data) => {
-          const ack = data["message"];
-          console.log(ack);
-          if (ack === "Invalid arguments") {
+          const resp = data["message"];
+          console.log(resp);
+          if (resp === "Rej") {
           }
-          if (ack === "Continue with questions") {
+          if (resp === "Ack") {
             setQImOn(qImOn + 1);
           } else {
-            setQImOn(1);
+            console.log("Refresh page");
             setNumCardsPutDown("");
             setAnyCalled("");
             setWhoCalled("");
             setRecommendation("No Recommendation Available");
+            setQImOn(1);
           }
         })
         .catch((error) => console.error(error));
@@ -97,11 +98,12 @@ function OppTurnPage() {
           return response.json();
         })
         .then((data) => {
-          const ack = data["message"];
-          console.log(ack);
-          if (ack === "Invalid arguments") {
+          const resp = data["message"];
+          console.log(resp);
+          // fix
+          if (resp === "Rej") {
           }
-          if (ack === "Continue with questions") {
+          if (resp === "Ack") {
             setQImOn(qImOn + 1);
           } else {
             setQImOn(1);
@@ -123,11 +125,12 @@ function OppTurnPage() {
           return response.json();
         })
         .then((data) => {
-          const ack = data["message"];
-          console.log(ack);
-          if (ack === "Invalid arguments") {
+          const resp = data["message"];
+          console.log(resp);
+          // fix
+          if (resp === "Rej") {
           }
-          if (ack === "Continue with questions") {
+          if (resp === "Ack") {
             setQImOn(qImOn + 1);
           } else {
             setQImOn(1);
@@ -148,9 +151,9 @@ function OppTurnPage() {
           return response.json();
         })
         .then((data) => {
-          const ack = data["message"];
-          console.log(ack);
-          if (ack === "Invalid arguments") {
+          const resp = data["message"];
+          console.log(resp);
+          if (resp === "Rej") {
           } else {
             setQImOn(1);
             setNumCardsPutDown("");
@@ -174,11 +177,10 @@ function OppTurnPage() {
       }
       if (qImOn === 3) {
         sendWhoCalledUrl();
+        sendCardsRevealedUrl();
+
       }
       if (qImOn === 4) {
-        sendCardsRevealedUrl();
-      }
-      if (qImOn === 5) {
         sendPotRevealedUrl();
       }
     }
@@ -238,7 +240,7 @@ function OppTurnPage() {
               id="new-todo-input"
               onChange={(e) => setCardsRevealed(e.target.value)}
               className="input input__lg"
-              disabled={!(qImOn === 4)}
+              disabled={!(qImOn === 3)}
             />
             <p />
             <label>Please Specify Pot Revealed?</label>
@@ -247,7 +249,7 @@ function OppTurnPage() {
               id="new-todo-input"
               onChange={(e) => setCardsRevealed(e.target.value)}
               className="input input__lg"
-              disabled={!(qImOn === 5)}
+              disabled={!(qImOn === 4)}
             />
             <p />
             <button type="submit" className="btn btn__primary btn__lg">

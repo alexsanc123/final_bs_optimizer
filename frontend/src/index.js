@@ -9,7 +9,6 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 // React.Strict Mode Caused my App.Js to be called twice
 // root.render(
 //   <React.StrictMode>
-//     <TestPage />
 //     <App />
 //   </React.StrictMode>
 // );
