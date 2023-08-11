@@ -3,6 +3,8 @@ import {
 
   Redirect,
 } from "react-router-dom";
+import { Button, NumericInput, InputGroup } from "@blueprintjs/core";
+
 console.log("StartPage component opened")
 
 function StartPage(BrowserRouter, world_state) {
@@ -67,12 +69,12 @@ function StartPage(BrowserRouter, world_state) {
     return <Redirect to="/infopage" />;
   } else {
     return (
-      <>
+      <div className="App">
         <h1>Game Initialization</h1>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="new-todo-input" className="label__lg">
+          <h2><label htmlFor="new-todo-input" className="label__lg">
             Please specify how many players are in the round
-          </label>
+          </label></h2>
           <div></div>
           <input
             type="text"
@@ -81,11 +83,15 @@ function StartPage(BrowserRouter, world_state) {
             className="input input__lg"
             value = {input1}
           />
+          <div className="number-players"><NumericInput
+                    defaultValue={3} min={3} max={9} 
+                /></div>
+          
           <div></div>
-          <label htmlFor="new-todo-input" className="label__lg">
+          <h3><label htmlFor="new-todo-input" className="label__lg">
             Please specify your seating index at the table clockwise from the
             0th player (the player left of dealer):
-          </label>
+          </label></h3>
           <div></div>
           <input
             type="text"
@@ -94,11 +100,15 @@ function StartPage(BrowserRouter, world_state) {
             className="input input__lg"
             value={input2}
           />
+          <div className="number-players"><NumericInput
+                    defaultValue={0} min={0} max={8} 
+                /></div>
           <div></div>
-          <label htmlFor="new-todo-input" className="label__lg">
+          <div></div>
+          <h4><label htmlFor="new-todo-input" className="label__lg">
             Please specify the seating index of the player with the Ace of
             spades (with respect to the dealer):
-          </label>
+          </label></h4>
           <div></div>
           <input
             type="text"
@@ -107,11 +117,14 @@ function StartPage(BrowserRouter, world_state) {
             className="input input__lg"
             value={input3}
           />
+          <div className="number-players"><NumericInput
+                    defaultValue={0} min={0} max={8} 
+                /></div>
           <div></div>
-          <label htmlFor="new-todo-input" className="label__lg">
+          <h5><label htmlFor="new-todo-input" className="label__lg">
             Please input a sequence of the cards in your hand e.g. 123
             represents Cards 1, 2, and 3
-          </label>
+          </label></h5>
           <div></div>
           <input
             type="text"
@@ -121,12 +134,16 @@ function StartPage(BrowserRouter, world_state) {
             value={input4}
           />
           <div>
-            <button type="submit" className="btn btn__primary btn__lg">
-              submit
+	    <div class="submit-button">
+            <button type="submit" className="btn btn__primary btn__lg" >
+              Submit
             </button>
+	    <Button intent="success" text="Fancy Submit" onClick={() => console.log('got clicked!')} />
+	    </div>
           </div>
+
         </form>
-      </>
+      </div>
     );
   }
 }
