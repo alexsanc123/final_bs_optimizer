@@ -7,7 +7,7 @@ import {
   Button,
   ButtonGroup,
   Card,
-  Elevation
+  Elevation,
 } from "@blueprintjs/core";
 
 function OppTurnPage() {
@@ -193,7 +193,6 @@ function OppTurnPage() {
             elevation={Elevation.TWO}
           >
             {world["game_log"]}
-
           </Card>
           <Card
             className="rec-log"
@@ -202,126 +201,137 @@ function OppTurnPage() {
           >
             <p>Recommendation: </p>
             <p className="rec-txt">{recommendation}</p>
-
           </Card>
-          <div>
-            <p>{recommendation}</p>
-          </div>
           <div>
             <h2>
               It is Player {whoseTurn}'s turn to place Down A(n) {cardOnTurn}
             </h2>
           </div>
-          <label className="prompt">
-            Please Specify How many card were placed?
-          </label>
 
           <form onSubmit={handleSubmit}>
-            <div
-              // onChange={(e) => setNumCardsPutDown(e.target.value)}
-              className="button-row"
-            >
-              <Button
-                intent="success"
-                text="1"
-                value="1"
-                onClick={(e) =>
-                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
-                }
-                active={numCardsPutDown === "1"}
-                disabled={!(qImOn === 1) && !(numCardsPutDown == 1)}
-              />
-              <Button
-                intent="success"
-                text="2"
-                value="2"
-                onClick={(e) =>
-                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
-                }
-                active={numCardsPutDown === "2"}
-                disabled={!(qImOn === 1) && !(numCardsPutDown == 2)}
-              />
-              <Button
-                intent="success"
-                text="3"
-                value="3"
-                onClick={(e) =>
-                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
-                }
-                active={numCardsPutDown === "3"}
-                disabled={!(qImOn === 1) && !(numCardsPutDown == 3)}
-              />
-              <Button
-                intent="success"
-                text="4"
-                value="4"
-                onClick={(e) =>
-                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
-                }
-                active={numCardsPutDown === "4"}
-                disabled={!(qImOn === 1) && !(numCardsPutDown == 4)}
-              />
+            <div class="page-column">
+              <div>
+                <label className="text-box">
+                  Please Specify How many card were placed?
+                </label>
+                <div
+                  // onChange={(e) => setNumCardsPutDown(e.target.value)}
+                  className="button-row"
+                >
+                  <Button
+                    intent="success"
+                    text="1"
+                    value="1"
+                    onClick={(e) =>
+                      qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                    }
+                    active={numCardsPutDown === "1"}
+                    disabled={!(qImOn === 1) && !(numCardsPutDown == 1)}
+                  />
+                  <Button
+                    intent="success"
+                    text="2"
+                    value="2"
+                    onClick={(e) =>
+                      qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                    }
+                    active={numCardsPutDown === "2"}
+                    disabled={!(qImOn === 1) && !(numCardsPutDown == 2)}
+                  />
+                  <Button
+                    intent="success"
+                    text="3"
+                    value="3"
+                    onClick={(e) =>
+                      qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                    }
+                    active={numCardsPutDown === "3"}
+                    disabled={!(qImOn === 1) && !(numCardsPutDown == 3)}
+                  />
+                  <Button
+                    intent="success"
+                    text="4"
+                    value="4"
+                    onClick={(e) =>
+                      qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                    }
+                    active={numCardsPutDown === "4"}
+                    disabled={!(qImOn === 1) && !(numCardsPutDown == 4)}
+                  />
+                </div>
+                <label className="text-box">Has Anyone Called?</label>
+                <div
+                  // onChange={(e) => setNumCardsPutDown(e.target.value)}
+                  className="button-row"
+                >
+                  <Button
+                    intent="success"
+                    text="true"
+                    value="true"
+                    onClick={(e) =>
+                      qImOn === 2 ? setAnyCalled(e.target.value) : {}
+                    }
+                    active={anyCalled === "true"}
+                    disabled={!(qImOn === 2) && !(anyCalled == "true")}
+                  />
+                  <Button
+                    intent="success"
+                    text="false"
+                    value="false"
+                    onClick={(e) =>
+                      qImOn === 2 ? setAnyCalled(e.target.value) : {}
+                    }
+                    active={anyCalled === "false"}
+                    disabled={!(qImOn === 2) && !(anyCalled == "false")}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <p className="please-center">
+                  <label className="text-box">Please Specify who Called?</label>
+                  <input
+                    type="text"
+                    id="new-todo-input"
+                    onChange={(e) => setWhoCalled(e.target.value)}
+                    className="help"
+                    ref={whoCalledRef}
+                    disabled={!(qImOn === 3)}
+                  />
+                </p>
+
+                <p className="please-center">
+                  <label className="text-box">
+                    Please Specify Cards Revealed?
+                  </label>
+                  <input
+                    type="text"
+                    id="new-todo-input"
+                    onChange={(e) => setCardsRevealed(e.target.value)}
+                    className="help"
+                    ref={cardsRevealedRef}
+                    disabled={!(qImOn === 3)}
+                  />
+                </p>
+                <p className="please-center">
+                  <label className="text-box">
+                    Please Specify Pot Revealed?
+                  </label>
+                  <input
+                    type="text"
+                    id="new-todo-input"
+                    onChange={(e) => setPotRevealed(e.target.value)}
+                    className="help"
+                    ref={potRevealedRef}
+                    disabled={!(qImOn === 4)}
+                  />
+                </p>
+              </div>
             </div>
 
-            <label className="prompt">Has Anyone Called?</label>
-            <div
-              // onChange={(e) => setNumCardsPutDown(e.target.value)}
-              className="button-row"
-            >
-              <Button
-                intent="success"
-                text="true"
-                value="true"
-                onClick={(e) =>
-                  qImOn === 2 ? setAnyCalled(e.target.value) : {}
-                }
-                active={anyCalled === "true"}
-                disabled={!(qImOn === 2) && !(anyCalled == "true")}
-              />
-              <Button
-                intent="success"
-                text="false"
-                value="false"
-                onClick={(e) =>
-                  qImOn === 2 ? setAnyCalled(e.target.value) : {}
-                }
-                active={anyCalled === "false"}
-                disabled={!(qImOn === 2) && !(anyCalled == "false")}
-              />
-            </div>
-            <label className="prompt">Please Specify who Called?</label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setWhoCalled(e.target.value)}
-              className="input input__lg"
-              ref={whoCalledRef}
-              disabled={!(qImOn === 3)}
-            />
-            <p>
-              <label className="prompt">Please Specify Cards Revealed?</label>
-              <input
-                type="text"
-                id="new-todo-input"
-                onChange={(e) => setCardsRevealed(e.target.value)}
-                className="input input__lg"
-                ref={cardsRevealedRef}
-                disabled={!(qImOn === 3)}
-              />
-            </p>
-            <p>
-              <label className="prompt">Please Specify Pot Revealed?</label>
-              <input
-                type="text"
-                id="new-todo-input"
-                onChange={(e) => setPotRevealed(e.target.value)}
-                className="input input__lg"
-                ref={potRevealedRef}
-                disabled={!(qImOn === 4)}
-              />
-            </p>
             <div className="submit-button">
               <Button
+                className="submit-button"
                 intent="success"
                 type="submit"
                 text="Submit"
