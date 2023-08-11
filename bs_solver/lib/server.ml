@@ -65,7 +65,9 @@ let handler ~body:_ _sock req =
          world_state.whose_turn <- Some 0;
          world_state.card_on_turn <- Some Card.Ace;
          world_state.strategy <- Some strategy;
-         Server.respond_string ack_json_string ~headers:header))
+         print_s[%message (world_state:World_state.t)];
+         Server.respond_string ack_json_string ~headers:header
+         ))
   | "/opponent_move" ->
     let query = Opponent_move.parse_opp_move uri in
     (match query with
@@ -128,19 +130,22 @@ let handler ~body:_ _sock req =
          let def = Game_state.whos_turn game in
          if def.id = game.my_id
          then (
+           print_s [%message (world_state.last_move : Card.t list option)];
            let is_lie =
              (match world_state.last_move with
               | Some cards_list -> cards_list
               | _ -> failwith "No last move")
              |> List.for_all ~f:(fun card_used ->
-                  Card.equal card_used (Game_state.card_on_turn game))
+               Card.equal card_used (Game_state.card_on_turn game))
+             |> not
            in
            if is_lie
-           then
-             Server.respond_string
-               "My turn showdown lost, reveal the pot"
-               ~headers:header
-           else Server.respond_string "My turn showdown won" ~headers:header)
+           then (
+             let json_string = Message.string_to_json_msg "Showdown Lost" in
+             Server.respond_string json_string ~headers:header)
+           else (
+             let json_string = Message.string_to_json_msg "Showdown Won" in
+             Server.respond_string json_string ~headers:header))
          else (
            let json_string = Message.string_to_json_msg "Showdown" in
            Server.respond_string json_string ~headers:header))
@@ -167,7 +172,7 @@ let handler ~body:_ _sock req =
        then Server.respond_string rej_json_string
        else if caller_id = game.my_id
                && List.for_all cards_revealed ~f:(fun card ->
-                    Card.equal card (Game_state.card_on_turn game))
+                 Card.equal card (Game_state.card_on_turn game))
        then (
          world_state.last_move <- Some cards_revealed;
          let json_string = Message.string_to_json_msg "Reveal pot" in
@@ -178,7 +183,8 @@ let handler ~body:_ _sock req =
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
-         Server.respond_string ack_json_string ~headers:header))
+         let json_string = Message.string_to_json_msg "Next Turn" in
+         Server.respond_string json_string ~headers:header))
   | "/reveal_pot" ->
     let query = Reveal_pot.parse_pot uri in
     (match query with
@@ -200,6 +206,7 @@ let handler ~body:_ _sock req =
            | None -> failwith "No cards"
          in
          Game_for_react.showdown ~game ~acc ~def ~pot ~cards_revealed ();
+         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
@@ -220,6 +227,7 @@ let handler ~body:_ _sock req =
        then Server.respond_string rej_json_string
        else (
          Game_for_react.showdown ~game ~acc ~def ~pot ();
+         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
@@ -240,6 +248,7 @@ let handler ~body:_ _sock req =
        then Server.respond_string rej_json_string
        else (
          Game_for_react.showdown ~game ~acc ~def ();
+         game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
