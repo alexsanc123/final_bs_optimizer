@@ -44,3 +44,58 @@ h6 {
   padding-bottom: 16px;
 
 }
+
+.prompt label {
+  /* 1px solid #282828;  */
+  color: black; /* White text */
+  padding: 20px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  width: 50%; /* Set a width if needed */
+  font-size: 24px;
+  font: Arial;
+  font-family: sans-serif;
+  display: block; /* Make the buttons appear below each other */
+}
+
+.navBarItems button {
+  background-color: #282828;
+  border: none;
+  /* 1px solid #282828;  */
+  color: white; /* White text */
+  padding: 20px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  width: 50%; /* Set a width if needed */
+  font-size: 18px;
+  font: Arial;
+  font-family: sans-serif;
+  display: block; /* Make the buttons appear below each other */
+}
+
+/* Add a background color on hover */
+.navBarItems button:hover {
+  background-color: #393939;
+}
+
+.navBarItems * {
+	margin: 5px 0 5px ;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 16rem 16rem;
+  grid-template-rows:   6rem 6rem;
+  gap: 1rem;
+}
+
+.slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 100px;
+}
+
+.prompt {
+  color : black;
+  font-size: 20px;
+  font-weight: bold;
+}
