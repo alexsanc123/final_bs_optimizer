@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Redirect } from "react-router-dom";
 import FetchWorld from "../FetchWorld";
+import { RadioGroup, Radio, Button } from "@blueprintjs/core";
 
 function OppTurnPage() {
   // console.log("OppTurn Function Opened");
@@ -196,15 +197,19 @@ function OppTurnPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <label>Please Specify How many card were placed</label>
-            <input
-              type="text"
-              id="new-todo-input"
+            <label></label>
+
+            <RadioGroup
+              label="Please Specify How many card were placed"
               onChange={(e) => setNumCardsPutDown(e.target.value)}
-              className="input input__lg"
-              ref={numCardsPlacedRef}
+              selectedValue={numCardsPutDown}
               disabled={!(qImOn === 1)}
-            />
+            >
+              <Radio label="1" value="1" />
+              <Radio label="2" value="2" />
+              <Radio label="3" value="3" />
+              <Radio label="4" value="4" />
+            </RadioGroup>
             <p />
             <label>Has Anyone Called?</label>
             <input
