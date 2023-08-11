@@ -7,6 +7,7 @@ import {
   Button,
   ButtonGroup,
   Card,
+  Elevation
 } from "@blueprintjs/core";
 
 function OppTurnPage() {
@@ -15,7 +16,7 @@ function OppTurnPage() {
   const [world, setWorld] = useState(null);
 
   const [numCardsPutDown, setNumCardsPutDown] = useState("");
-  const [anyCalled, setAnyCalled] = useState(false);
+  const [anyCalled, setAnyCalled] = useState("");
   const [whoCalled, setWhoCalled] = useState("");
   const [recommendation, setRecommendation] = useState(
     "No Recommendation Available"
@@ -25,8 +26,6 @@ function OppTurnPage() {
   const [qImOn, setQImOn] = useState(1);
   const [potRevealed, setPotRevealed] = useState(null);
 
-  const numCardsPlacedRef = useRef("");
-  const anyoneCalledRef = useRef("");
   const whoCalledRef = useRef("");
   const cardsRevealedRef = useRef("");
   const potRevealedRef = useRef("");
@@ -92,10 +91,9 @@ function OppTurnPage() {
           }
           if (resp === "No Showdown") {
             console.log("Refresh page");
-
+            setNumCardsPutDown("");
+            setAnyCalled("");
             setQImOn(1);
-            numCardsPlacedRef.current.value = "";
-            anyoneCalledRef.current.value = "";
             whoCalledRef.current.value = "";
             cardsRevealedRef.current.value = "";
             potRevealedRef.current.value = "";
@@ -127,10 +125,10 @@ function OppTurnPage() {
           }
           if (resp === "Next Turn") {
             console.log("AACKKKKK");
+            setNumCardsPutDown("");
+            setAnyCalled("");
             setQImOn(1);
 
-            numCardsPlacedRef.current.value = "";
-            anyoneCalledRef.current.value = "";
             whoCalledRef.current.value = "";
             cardsRevealedRef.current.value = "";
             potRevealedRef.current.value = "";
@@ -152,11 +150,9 @@ function OppTurnPage() {
           if (resp === "Rej") {
           }
           if (resp == "Ack") {
-            console.log("AACKKKKK");
+            setNumCardsPutDown("");
+            setAnyCalled("");
             setQImOn(1);
-
-            numCardsPlacedRef.current.value = "";
-            anyoneCalledRef.current.value = "";
             whoCalledRef.current.value = "";
             cardsRevealedRef.current.value = "";
             potRevealedRef.current.value = "";
@@ -191,9 +187,24 @@ function OppTurnPage() {
       return (
         <>
           <h1>BS Optimizer</h1>
-          <div>
-            <p> Game Log ... </p>
+          <Card
+            className="game-log"
+            interactive={true}
+            elevation={Elevation.TWO}
+          >
+            {world["game_log"]}
 
+          </Card>
+          <Card
+            className="rec-log"
+            interactive={true}
+            elevation={Elevation.TWO}
+          >
+            <p>Recommendation: </p>
+            <p className="rec-txt">{recommendation}</p>
+
+          </Card>
+          <div>
             <p>{recommendation}</p>
           </div>
           <div>
@@ -287,28 +298,36 @@ function OppTurnPage() {
               ref={whoCalledRef}
               disabled={!(qImOn === 3)}
             />
-            <p />
-            <label className="prompt">Please Specify Cards Revealed?</label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setCardsRevealed(e.target.value)}
-              className="input input__lg"
-              ref={cardsRevealedRef}
-              disabled={!(qImOn === 3)}
-            />
-            <label className="prompt">Please Specify Pot Revealed?</label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setPotRevealed(e.target.value)}
-              className="input input__lg"
-              ref={potRevealedRef}
-              disabled={!(qImOn === 4)}
-            />
-            <button type="submit" className="btn btn__primary btn__lg">
-              submit
-            </button>
+            <p>
+              <label className="prompt">Please Specify Cards Revealed?</label>
+              <input
+                type="text"
+                id="new-todo-input"
+                onChange={(e) => setCardsRevealed(e.target.value)}
+                className="input input__lg"
+                ref={cardsRevealedRef}
+                disabled={!(qImOn === 3)}
+              />
+            </p>
+            <p>
+              <label className="prompt">Please Specify Pot Revealed?</label>
+              <input
+                type="text"
+                id="new-todo-input"
+                onChange={(e) => setPotRevealed(e.target.value)}
+                className="input input__lg"
+                ref={potRevealedRef}
+                disabled={!(qImOn === 4)}
+              />
+            </p>
+            <div className="submit-button">
+              <Button
+                intent="success"
+                type="submit"
+                text="Submit"
+                onClick={() => console.log("got clicked!")}
+              />
+            </div>
           </form>
 
           <div></div>

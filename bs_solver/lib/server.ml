@@ -179,7 +179,7 @@ let handler ~body:_ _sock req =
        let acc = Hashtbl.find_exn game.all_players caller_id in
        let def = Game_state.whos_turn game in
        if Opp_showdown.invalid_arguments ~caller_id ~def:def.id
-       then Server.respond_string rej_json_string
+       then Server.respond_string rej_json_string ~headers:header
        else if caller_id = game.my_id
                && List.for_all cards_revealed ~f:(fun card ->
                     Card.equal card (Game_state.card_on_turn game))

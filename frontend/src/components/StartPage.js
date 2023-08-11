@@ -140,7 +140,6 @@ function StartPage(BrowserRouter, world_state) {
             className="input input__lg"
             value={input4}
           />
-          <div>
             <div className="submit-button">
               <Button
                 intent="success"
@@ -148,7 +147,6 @@ function StartPage(BrowserRouter, world_state) {
                 text="Submit"
                 onClick={() => console.log("got clicked!")}
               />
-            </div>
           </div>
         </form>
       </div>

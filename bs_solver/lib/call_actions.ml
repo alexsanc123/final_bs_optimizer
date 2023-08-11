@@ -124,12 +124,12 @@ let probability_based_call
      strategy_without_lies then 100.0 else 75.0 in) *)
   if Float.( >. ) prob_of_lie 75.0
   then
-    "Reccomendation: call your opponent's bluff. Probability the player is \
+    "Call your opponent's bluff. Probability the player is \
      lying: "
     ^ Float.to_string prob_of_lie
     ^ "%"
   else
-    "Reccomendation: do not call your opponent's bluff. Probability the \
+    "Don't call your opponent's bluff. Probability the \
      player is lying: "
     ^ Float.to_string prob_of_lie
     ^ "%"
