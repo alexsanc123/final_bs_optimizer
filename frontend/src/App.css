@@ -3,12 +3,14 @@
   background: #EFE9E4;
 }
 
-h1 {
+.bs {
+  padding-top: 25px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 300%;
+  font-size: 400%;
   text-align: center;
   color: #333333;
   text-shadow: #333333;
+  font-weight: bo;
 }
 
 h2,
@@ -55,6 +57,18 @@ h6 {
   padding-top: 16px;
   padding-bottom: 16px;
 
+}
+
+.strat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  fill: white;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  font-family: 'Montserrat', sans-serif;
+    font-size: 130%;
 }
 
 .card {
