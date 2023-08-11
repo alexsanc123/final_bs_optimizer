@@ -45,6 +45,16 @@ h6 {
 
 }
 
+.card {
+  border-radius: 8px;
+}
+
+.suggested-strategy {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+
 .prompt label {
   /* 1px solid #282828;  */
   color: black; /* White text */
