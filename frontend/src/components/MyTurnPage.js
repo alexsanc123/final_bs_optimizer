@@ -40,7 +40,7 @@ function MyTurnPage() {
     // const playerCount = currentGame["player_count"];
     const strategy = world["strategy"].map(
       ([cardToProvide, ...cardsRecommended]) =>
-        cardToProvide + "-(" + cardsRecommended + ");  "
+       ""+ cardToProvide + "- (" + cardsRecommended + ");  "
     );
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
@@ -215,18 +215,24 @@ function MyTurnPage() {
       // console.log("OppTurn Function Closed");
       return (
         <>
+        <head>
+        <link href="path/to/node_modules/@blueprintjs/icons/lib/css/blueprint-icons.css" rel="stylesheet" />
+        <title>BS Optimizer</title>
+        <link rel="stylesheet" href="App.css"></link>
+        </head>
           <h1>BS Optimizer</h1>
-          <div>
-            <p> Game Log ... </p>
-
-            <p>Suggested Strategy: {strategy}</p>
+          <div className="App">
+            <div>
+            <h2> Game Log ... </h2>
+            <h2>Suggested Strategy: {strategy}</h2>
+            
           </div>
           <div>
-            <h2>It is Our turn to place Down A(n) {cardOnTurn}</h2>
+            <h2>It's our turn to place down a(n) {cardOnTurn}</h2>
           </div>
 
           <form onSubmit={handleSubmit}>
-            <label>Please Specify How many cards we placed</label>
+            <label className="text-box">Please specify how many cards we placed: </label>
             <input
               type="text"
               id="new-todo-input"
@@ -234,8 +240,8 @@ function MyTurnPage() {
               className="input input__lg"
               disabled={!(qImOn === 1)}
             />
-            <p />
-            <label>Please Specify What Cards We placed</label>
+            <h2 />
+            <label className="text-box">Please specify what cards we placed: </label>
             <input
               type="text"
               id="new-todo-input"
@@ -243,8 +249,8 @@ function MyTurnPage() {
               className="input input__lg"
               disabled={!(qImOn === 1)}
             />
-            <p />
-            <label>Has Anyone Called?</label>
+            <h2 />
+            <label className="text-box">Has anyone called?</label>
             <input
               type="text"
               id="new-todo-input"
@@ -252,8 +258,8 @@ function MyTurnPage() {
               className="input input__lg"
               disabled={!(qImOn === 2)}
             />
-            <p />
-            <label>Please Specify who Called?</label>
+            <h2 />
+            <label className="text-box">Please specify the ID of the player who called:</label>
             <input
               type="text"
               id="new-todo-input"
@@ -261,8 +267,8 @@ function MyTurnPage() {
               className="input input__lg"
               disabled={!(qImOn === 3)}
             />
-            <p />
-            <label>Please Specify Pot Revealed?</label>
+            <h2 />
+            <label className="text-box">Please specify the cards revealed in the pot you recovered:</label>
             <input
               type="text"
               id="new-todo-input"
@@ -270,12 +276,12 @@ function MyTurnPage() {
               className="input input__lg"
               disabled={!(qImOn === 3 && !showdownWon)}
             />
-            <p />
+            <h2 />
             <button type="submit" className="btn btn__primary btn__lg">
               submit
             </button>
-          </form>
-
+          </form></div>
+          
           <div></div>
         </>
       );

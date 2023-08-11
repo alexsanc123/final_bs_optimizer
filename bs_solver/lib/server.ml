@@ -65,9 +65,14 @@ let handler ~body:_ _sock req =
          world_state.whose_turn <- Some 0;
          world_state.card_on_turn <- Some Card.Ace;
          world_state.strategy <- Some strategy;
-         print_s[%message (world_state:World_state.t)];
-         Server.respond_string ack_json_string ~headers:header
-         ))
+         world_state.game_log
+           <- Some
+                [ "Game has been created with "
+                  ^ Int.to_string num_players
+                  ^ "."
+                ];
+         print_s [%message (world_state : World_state.t)];
+         Server.respond_string ack_json_string ~headers:header))
   | "/opponent_move" ->
     let query = Opponent_move.parse_opp_move uri in
     (match query with
@@ -78,6 +83,11 @@ let handler ~body:_ _sock req =
          print_endline "Invalid";
          Server.respond_string rej_json_string ~headers:header)
        else (
+         let _game_log =
+           match world_state.game_log with
+           | Some game_log -> game_log
+           | _ -> failwith "no game log"
+         in
          let game =
            match world_state.current_game with
            | Some game_state -> game_state
@@ -136,7 +146,7 @@ let handler ~body:_ _sock req =
               | Some cards_list -> cards_list
               | _ -> failwith "No last move")
              |> List.for_all ~f:(fun card_used ->
-               Card.equal card_used (Game_state.card_on_turn game))
+                  Card.equal card_used (Game_state.card_on_turn game))
              |> not
            in
            if is_lie
@@ -172,7 +182,7 @@ let handler ~body:_ _sock req =
        then Server.respond_string rej_json_string
        else if caller_id = game.my_id
                && List.for_all cards_revealed ~f:(fun card ->
-                 Card.equal card (Game_state.card_on_turn game))
+                    Card.equal card (Game_state.card_on_turn game))
        then (
          world_state.last_move <- Some cards_revealed;
          let json_string = Message.string_to_json_msg "Reveal pot" in
