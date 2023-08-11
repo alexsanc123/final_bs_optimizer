@@ -67,7 +67,7 @@ function MyTurnPage() {
     // const playerCount = currentGame["player_count"];
     const strategy = world["strategy"].map(
       ([cardToProvide, ...cardsRecommended]) =>
-       cardToProvide + "- (" + cardsRecommended + ");  "
+       cardToProvide + " turn: [" + cardsRecommended + "];   "
     );
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
@@ -247,15 +247,15 @@ function MyTurnPage() {
         <title>BS Optimizer</title>
         <link rel="stylesheet" href="App.css"></link>
         </head>
-          <h1>BS Optimizer</h1>
+          <p className="bs">BS Optimizer</p>
           <div className="App">
             <div>
-            <h2> Game Log ... </h2>
-            <h2>Suggested Strategy: {strategy}</h2>
+            <p className="text-box"> Game Log ... </p>
+            
             
           </div>
           <div>
-            <h2>It's our turn to place down a(n) {cardOnTurn}</h2>
+          <p className="text-box">It's our turn to place down a(n) {cardOnTurn}</p>
             <div>{renderCard(cardOnTurn[0])}</div>
             
           </div>
@@ -309,6 +309,7 @@ function MyTurnPage() {
             <button type="submit" className="btn btn__primary btn__lg">
               submit
             </button>
+            <p className="strat">Suggested Strategy: {strategy}</p>
           </form></div>
           
           

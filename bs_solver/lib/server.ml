@@ -69,7 +69,7 @@ let handler ~body:_ _sock req =
            <- Some
                 [ "Game has been created with "
                   ^ Int.to_string num_players
-                  ^ "."
+                  ^ " players."
                 ];
          print_s [%message (world_state : World_state.t)];
          Server.respond_string ack_json_string ~headers:header))
@@ -83,7 +83,7 @@ let handler ~body:_ _sock req =
          print_endline "Invalid";
          Server.respond_string rej_json_string ~headers:header)
        else (
-         let _game_log =
+         let game_log =
            match world_state.game_log with
            | Some game_log -> game_log
            | _ -> failwith "no game log"
@@ -102,6 +102,16 @@ let handler ~body:_ _sock req =
              ~claim:(player.id, card, num_cards)
          in
          world_state.current_game <- Some game;
+         let new_log =
+           game_log
+           @ [ "Player "
+               ^ Int.to_string player.id
+               ^ " just put "
+               ^ Int.to_string num_cards
+               ^ " cards into the pot."
+             ]
+         in
+         world_state.game_log <- Some new_log;
          let json_string = Message.string_to_json_msg reccomendation in
          print_endline "Working";
          Server.respond_string json_string ~headers:header))
@@ -115,6 +125,11 @@ let handler ~body:_ _sock req =
          | Some game_state -> game_state
          | _ -> failwith "Invalid game"
        in
+       let game_log =
+         match world_state.game_log with
+         | Some game_log -> game_log
+         | _ -> failwith "no game log"
+       in
        if My_move.invalid_arguments ~game ~num_cards ~cards_put_down
        then (
          print_endline "Invalid";
@@ -123,6 +138,14 @@ let handler ~body:_ _sock req =
          Game_for_react.my_moves game ~num_cards ~cards_put_down;
          world_state.current_game <- Some game;
          world_state.last_move <- Some cards_put_down;
+         let new_log =
+           game_log
+           @ [ "I just put "
+               ^ Int.to_string num_cards
+               ^ " cards into the pot."
+             ]
+         in
+         world_state.game_log <- Some new_log;
          print_endline "Move Made";
          Server.respond_string ack_json_string ~headers:header))
   | "/check_bluff" ->
@@ -134,6 +157,11 @@ let handler ~body:_ _sock req =
          match World_state.current_game world_state with
          | Some game_state -> game_state
          | _ -> failwith "Invalid game"
+       in
+       let game_log =
+         match world_state.game_log with
+         | Some game_log -> game_log
+         | _ -> failwith "no game log"
        in
        if bluff_called
        then (
@@ -151,17 +179,43 @@ let handler ~body:_ _sock req =
            in
            if is_lie
            then (
+             let new_log =
+               game_log
+               @ [ "I just lost a showdown and recovered "
+                   ^ Int.to_string (List.length game.pot)
+                   ^ " cards from the pot."
+                 ]
+             in
+             world_state.game_log <- Some new_log;
              let json_string = Message.string_to_json_msg "Showdown Lost" in
              Server.respond_string json_string ~headers:header)
            else (
+             let new_log = game_log @ [ "I just won a showdown." ] in
+             world_state.game_log <- Some new_log;
              let json_string = Message.string_to_json_msg "Showdown Won" in
              Server.respond_string json_string ~headers:header))
          else (
+           let new_log =
+             game_log
+             @ [ "Someone just called player "
+                 ^ Int.to_string (Game_state.whos_turn game).id
+                 ^ "'s bluff."
+               ]
+           in
+           world_state.game_log <- Some new_log;
            let json_string = Message.string_to_json_msg "Showdown" in
            Server.respond_string json_string ~headers:header))
        else (
          game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
+         let new_log =
+          game_log
+          @ [ "No one called player "
+              ^ Int.to_string (Game_state.whos_turn game).id
+              ^ "'s bluff."
+            ]
+        in
+        world_state.game_log <- Some new_log;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
          let json_string = Message.string_to_json_msg "No Showdown" in
