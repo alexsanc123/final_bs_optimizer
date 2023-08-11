@@ -56,3 +56,13 @@ h6 {
   padding-bottom: 16px;
 
 }
+
+.card {
+  border-radius: 8px;
+}
+
+.suggested-strategy {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+

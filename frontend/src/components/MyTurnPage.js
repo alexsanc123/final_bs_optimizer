@@ -1,6 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import FetchWorld from "../FetchWorld";
+import PlayingCardsList from './PlayingCardsList';
+
+function renderImg(src){
+  return <img class="card" src={PlayingCardsList[src]}/>
+}
+
+function renderCard(card) {
+  const m = {
+    'Ace': '1c',
+    'Two': '2c',
+    'Three': '3c',
+    'Four': '4c',
+    'Five': '5c',
+    'Six': '6c',
+    'Seven': '7c',
+    'Eight': '8c',
+    'Nine': '9c',
+    'Ten': '10c',
+    'Jack': 'jc',
+    'Queen': 'qc',
+    'King': 'kc',
+  }
+
+  return renderImg(m[card]);
+}
+
+
 
 function MyTurnPage() {
   // console.log("OppTurn Function Opened");
@@ -225,7 +252,19 @@ function MyTurnPage() {
             <div>
             <h2> Game Log ... </h2>
             <h2>Suggested Strategy: {strategy}</h2>
-            
+	    <div class="suggested-strategy">
+	      {world['strategy'].map((card, ...cards) => 
+		 {
+		    return <><div>
+				 {renderCard(card)}
+				 </div><div>
+				 {cards.map(card => renderCard(card))}
+				 </div></>
+
+		 }
+
+	      )}
+	    </div>
           </div>
           <div>
             <h2>It's our turn to place down a(n) {cardOnTurn}</h2>
@@ -282,7 +321,7 @@ function MyTurnPage() {
             </button>
           </form></div>
           
-          <div></div>
+          <div>{JSON.stringify(PlayingCardsList)}</div>
         </>
       );
     }

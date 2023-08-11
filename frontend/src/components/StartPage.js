@@ -4,6 +4,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import { Button, NumericInput, InputGroup } from "@blueprintjs/core";
+import PlayingCardsList from './PlayingCardsList';
 
 console.log("StartPage component opened")
 
@@ -141,7 +142,6 @@ function StartPage(BrowserRouter, world_state) {
 	    <Button intent="success" text="Fancy Submit" onClick={() => console.log('got clicked!')} />
 	    </div>
           </div>
-
         </form>
       </div>
     );
