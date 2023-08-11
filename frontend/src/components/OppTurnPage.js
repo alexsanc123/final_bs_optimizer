@@ -214,7 +214,7 @@ function OppTurnPage() {
             <div class="page-column">
               <div>
                 <label className="text-box">
-                  Please Specify How many card were placed?
+                  Please specify how many cards were put down
                 </label>
                 <div
                   // onChange={(e) => setNumCardsPutDown(e.target.value)}
@@ -261,7 +261,7 @@ function OppTurnPage() {
                     disabled={!(qImOn === 1) && !(numCardsPutDown == 4)}
                   />
                 </div>
-                <label className="text-box">Has Anyone Called?</label>
+                <label className="text-box">Has anyone called?</label>
                 <div
                   // onChange={(e) => setNumCardsPutDown(e.target.value)}
                   className="button-row"
@@ -291,7 +291,7 @@ function OppTurnPage() {
 
               <div>
                 <p className="please-center">
-                  <label className="text-box">Please Specify who Called?</label>
+                  <label className="text-box">Please specify who called</label>
                   <input
                     type="text"
                     id="new-todo-input"
@@ -317,7 +317,7 @@ function OppTurnPage() {
                 </p>
                 <p className="please-center">
                   <label className="text-box">
-                    Please Specify Pot Revealed?
+                    Please specify cards in the pot revealed
                   </label>
                   <input
                     type="text"
