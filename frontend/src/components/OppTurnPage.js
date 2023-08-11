@@ -186,7 +186,7 @@ function OppTurnPage() {
       // console.log("OppTurn Function Closed");
       return (
         <>
-          <h1>BS Optimizer</h1>
+          <h1 className="bs">BS Optimizer</h1>
           <Card
             className="game-log"
             interactive={true}

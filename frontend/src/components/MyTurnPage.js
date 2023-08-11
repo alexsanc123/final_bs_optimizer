@@ -264,7 +264,7 @@ function MyTurnPage() {
               href="path/to/node_modules/@blueprintjs/icons/lib/css/blueprint-icons.css"
               rel="stylesheet"
             />
-            <title>BS Optimizer</title>
+            <title >BS Optimizer</title>
             <link rel="stylesheet" href="App.css"></link>
           </head>
           <h1 className="bs">BS Optimizer</h1>
