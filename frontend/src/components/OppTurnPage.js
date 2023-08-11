@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Redirect } from "react-router-dom";
 import FetchWorld from "../FetchWorld";
-import { RadioGroup, Radio, Button } from "@blueprintjs/core";
+import {
+  RadioGroup,
+  Radio,
+  Button,
+  ButtonGroup,
+  Card,
+} from "@blueprintjs/core";
 
 function OppTurnPage() {
   // console.log("OppTurn Function Opened");
@@ -195,33 +201,84 @@ function OppTurnPage() {
               It is Player {whoseTurn}'s turn to place Down A(n) {cardOnTurn}
             </h2>
           </div>
+          <label className="prompt">
+            Please Specify How many card were placed?
+          </label>
 
           <form onSubmit={handleSubmit}>
-            <label></label>
-
-            <RadioGroup
-              label="Please Specify How many card were placed"
-              onChange={(e) => setNumCardsPutDown(e.target.value)}
-              selectedValue={numCardsPutDown}
-              disabled={!(qImOn === 1)}
+            <div
+              // onChange={(e) => setNumCardsPutDown(e.target.value)}
+              className="button-row"
             >
-              <Radio label="1" value="1" />
-              <Radio label="2" value="2" />
-              <Radio label="3" value="3" />
-              <Radio label="4" value="4" />
-            </RadioGroup>
-            <p />
-            <label>Has Anyone Called?</label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setAnyCalled(e.target.value)}
-              className="input input__lg"
-              ref={anyoneCalledRef}
-              disabled={!(qImOn === 2)}
-            />
-            <p />
-            <label>Please Specify who Called?</label>
+              <Button
+                intent="success"
+                text="1"
+                value="1"
+                onClick={(e) =>
+                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                }
+                active={numCardsPutDown === "1"}
+                disabled={!(qImOn === 1) && !(numCardsPutDown == 1)}
+              />
+              <Button
+                intent="success"
+                text="2"
+                value="2"
+                onClick={(e) =>
+                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                }
+                active={numCardsPutDown === "2"}
+                disabled={!(qImOn === 1) && !(numCardsPutDown == 2)}
+              />
+              <Button
+                intent="success"
+                text="3"
+                value="3"
+                onClick={(e) =>
+                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                }
+                active={numCardsPutDown === "3"}
+                disabled={!(qImOn === 1) && !(numCardsPutDown == 3)}
+              />
+              <Button
+                intent="success"
+                text="4"
+                value="4"
+                onClick={(e) =>
+                  qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                }
+                active={numCardsPutDown === "4"}
+                disabled={!(qImOn === 1) && !(numCardsPutDown == 4)}
+              />
+            </div>
+
+            <label className="prompt">Has Anyone Called?</label>
+            <div
+              // onChange={(e) => setNumCardsPutDown(e.target.value)}
+              className="button-row"
+            >
+              <Button
+                intent="success"
+                text="true"
+                value="true"
+                onClick={(e) =>
+                  qImOn === 2 ? setAnyCalled(e.target.value) : {}
+                }
+                active={anyCalled === "true"}
+                disabled={!(qImOn === 2) && !(anyCalled == "true")}
+              />
+              <Button
+                intent="success"
+                text="false"
+                value="false"
+                onClick={(e) =>
+                  qImOn === 2 ? setAnyCalled(e.target.value) : {}
+                }
+                active={anyCalled === "false"}
+                disabled={!(qImOn === 2) && !(anyCalled == "false")}
+              />
+            </div>
+            <label className="prompt">Please Specify who Called?</label>
             <input
               type="text"
               id="new-todo-input"
@@ -231,7 +288,7 @@ function OppTurnPage() {
               disabled={!(qImOn === 3)}
             />
             <p />
-            <label>Please Specify Cards Revealed?</label>
+            <label className="prompt">Please Specify Cards Revealed?</label>
             <input
               type="text"
               id="new-todo-input"
@@ -240,8 +297,7 @@ function OppTurnPage() {
               ref={cardsRevealedRef}
               disabled={!(qImOn === 3)}
             />
-            <p />
-            <label>Please Specify Pot Revealed?</label>
+            <label className="prompt">Please Specify Pot Revealed?</label>
             <input
               type="text"
               id="new-todo-input"
@@ -250,7 +306,6 @@ function OppTurnPage() {
               ref={potRevealedRef}
               disabled={!(qImOn === 4)}
             />
-            <p />
             <button type="submit" className="btn btn__primary btn__lg">
               submit
             </button>
