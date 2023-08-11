@@ -1,33 +1,39 @@
-import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
+import PlayingCardsList from "./PlayingCardsList";
+import React, { useState, useEffect, useRef } from "react";
 import FetchWorld from "../FetchWorld";
-import PlayingCardsList from './PlayingCardsList';
+import {
+  RadioGroup,
+  Radio,
+  Button,
+  ButtonGroup,
+  Card,
+  Elevation,
+} from "@blueprintjs/core";
 
-function renderImg(card){
-  return <img class="card" src={PlayingCardsList[card]}/>
+function renderImg(card) {
+  return <img class="card" src={PlayingCardsList[card]} />;
 }
 
 function renderCard(card) {
   const m = {
-    'Ace': '1c',
-    'Two': '2h',
-    'Three': '3s',
-    'Four': '4d',
-    'Five': '5c',
-    'Six': '6h',
-    'Seven': '7s',
-    'Eight': '8d',
-    'Nine': '9c',
-    'Ten': '10h',
-    'Jack': 'js',
-    'Queen': 'qd',
-    'King': 'kh',
-  }
+    Ace: "1c",
+    Two: "2h",
+    Three: "3s",
+    Four: "4d",
+    Five: "5c",
+    Six: "6h",
+    Seven: "7s",
+    Eight: "8d",
+    Nine: "9c",
+    Ten: "10h",
+    Jack: "js",
+    Queen: "qd",
+    King: "kh",
+  };
 
   return renderImg(m[card]);
 }
-
-
 
 function MyTurnPage() {
   // console.log("OppTurn Function Opened");
@@ -67,7 +73,7 @@ function MyTurnPage() {
     // const playerCount = currentGame["player_count"];
     const strategy = world["strategy"].map(
       ([cardToProvide, ...cardsRecommended]) =>
-       cardToProvide + " turn: [" + cardsRecommended + "];   "
+        cardToProvide + " turn: [" + cardsRecommended + "];   "
     );
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
@@ -242,77 +248,174 @@ function MyTurnPage() {
       // console.log("OppTurn Function Closed");
       return (
         <>
-        <head>
-        <link href="path/to/node_modules/@blueprintjs/icons/lib/css/blueprint-icons.css" rel="stylesheet" />
-        <title>BS Optimizer</title>
-        <link rel="stylesheet" href="App.css"></link>
-        </head>
-          <p className="bs">BS Optimizer</p>
+          <head>
+            <link
+              href="path/to/node_modules/@blueprintjs/icons/lib/css/blueprint-icons.css"
+              rel="stylesheet"
+            />
+            <title>BS Optimizer</title>
+            <link rel="stylesheet" href="App.css"></link>
+          </head>
+          <h1 className="bs">BS Optimizer</h1>
+          <Card
+            className="game-log"
+            interactive={true}
+            elevation={Elevation.TWO}
+          >
+            {world["game_log"]}
+          </Card>
+          <Card
+            className="rec-log"
+            interactive={true}
+            elevation={Elevation.TWO}
+          >
+            <p>Recommendation: </p>
+            <p className="rec-txt">{recommendation}</p>
+          </Card>
+          <div>
+            <h2>
+              It is Player {whoseTurn}'s turn to place down a(n) {cardOnTurn}
+            </h2>
+          </div>
           <div className="App">
             <div>
-            <p className="text-box"> Game Log ... </p>
-            
-            
-          </div>
-          <div>
-          <p className="text-box">It's our turn to place down a(n) {cardOnTurn}</p>
-            <div>{renderCard(cardOnTurn[0])}</div>
-            
-          </div>
+              <div>{renderCard(cardOnTurn[0])}</div>
+            </div>
 
-          <form onSubmit={handleSubmit}>
-            <label className="text-box">Please specify how many cards we placed: </label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setNumCardsPutDown(e.target.value)}
-              className="input input__lg"
-              disabled={!(qImOn === 1)}
-            />
-            <h2 />
-            <label className="text-box">Please specify what cards we placed: </label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setCardsPutDown(e.target.value)}
-              className="input input__lg"
-              disabled={!(qImOn === 1)}
-            />
-            <h2 />
-            <label className="text-box">Has anyone called?</label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setAnyCalled(e.target.value)}
-              className="input input__lg"
-              disabled={!(qImOn === 2)}
-            />
-            <h2 />
-            <label className="text-box">Please specify the ID of the player who called:</label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setWhoCalled(e.target.value)}
-              className="input input__lg"
-              disabled={!(qImOn === 3)}
-            />
-            <h2 />
-            <label className="text-box">Please specify the cards revealed in the pot you recovered:</label>
-            <input
-              type="text"
-              id="new-todo-input"
-              onChange={(e) => setPotRevealed(e.target.value)}
-              className="input input__lg"
-              disabled={!(qImOn === 3 && !showdownWon)}
-            />
-            <h2 />
-            <button type="submit" className="btn btn__primary btn__lg">
-              submit
-            </button>
-            <p className="strat">Suggested Strategy: {strategy}</p>
-          </form></div>
-          
-          
+            <form onSubmit={handleSubmit}>
+              <div class="page-column">
+                <div>
+                  <label className="text-box">
+                    Please specify how many cards we placed:{" "}
+                  </label>
+                  <div
+                    // onChange={(e) => setNumCardsPutDown(e.target.value)}
+                    className="button-row"
+                  >
+                    <Button
+                      intent="success"
+                      text="1"
+                      value="1"
+                      onClick={(e) =>
+                        qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                      }
+                      active={numCardsPutDown === "1"}
+                      disabled={!(qImOn === 1) && !(numCardsPutDown == 1)}
+                    />
+                    <Button
+                      intent="success"
+                      text="2"
+                      value="2"
+                      onClick={(e) =>
+                        qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                      }
+                      active={numCardsPutDown === "2"}
+                      disabled={!(qImOn === 1) && !(numCardsPutDown == 2)}
+                    />
+                    <Button
+                      intent="success"
+                      text="3"
+                      value="3"
+                      onClick={(e) =>
+                        qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                      }
+                      active={numCardsPutDown === "3"}
+                      disabled={!(qImOn === 1) && !(numCardsPutDown == 3)}
+                    />
+                    <Button
+                      intent="success"
+                      text="4"
+                      value="4"
+                      onClick={(e) =>
+                        qImOn === 1 ? setNumCardsPutDown(e.target.value) : {}
+                      }
+                      active={numCardsPutDown === "4"}
+                      disabled={!(qImOn === 1) && !(numCardsPutDown == 4)}
+                    />
+                  </div>
+
+                  <h2 />
+                  <label className="text-box">
+                    Please specify what cards we placed:{" "}
+                  </label>
+                  <input
+                    type="text"
+                    id="new-todo-input"
+                    onChange={(e) => setCardsPutDown(e.target.value)}
+                    className="input input__lg"
+                    disabled={!(qImOn === 1)}
+                  />
+                  <h2 />
+                </div>
+                <div>
+                  <label className="text-box">Has anyone called?</label>
+                  <div
+                    // onChange={(e) => setNumCardsPutDown(e.target.value)}
+                    className="button-row"
+                  >
+                    <Button
+                      intent="success"
+                      text="true"
+                      value="true"
+                      onClick={(e) =>
+                        qImOn === 2 ? setAnyCalled(e.target.value) : {}
+                      }
+                      active={anyCalled === "true"}
+                      disabled={!(qImOn === 2) && !(anyCalled == "true")}
+                    />
+                    <Button
+                      intent="success"
+                      text="false"
+                      value="false"
+                      onClick={(e) =>
+                        qImOn === 2 ? setAnyCalled(e.target.value) : {}
+                      }
+                      active={anyCalled === "false"}
+                      disabled={!(qImOn === 2) && !(anyCalled == "false")}
+                    />
+                  </div>
+                  <label className="text-box">
+                    Please specify the ID of the player who called:
+                  </label>
+                  <input
+                    type="text"
+                    id="new-todo-input"
+                    onChange={(e) => setWhoCalled(e.target.value)}
+                    className="input input__lg"
+                    disabled={!(qImOn === 3)}
+                  />
+                  <h2 />
+                  <label className="text-box">
+                    Please specify the cards revealed in the pot you recovered:
+                  </label>
+                  <input
+                    type="text"
+                    id="new-todo-input"
+                    onChange={(e) => setPotRevealed(e.target.value)}
+                    className="input input__lg"
+                    disabled={!(qImOn === 3 && !showdownWon)}
+                  />
+                </div>
+              </div>
+              <p></p>
+              <p></p>
+              <p></p>
+              <div></div>
+              <div></div>
+
+              <div className="submit-button">
+                <Button
+                  className="submit-button"
+                  intent="success"
+                  type="submit"
+                  text="Submit"
+                  onClick={() => console.log("got clicked!")}
+                />
+              </div>
+
+              <p className="strat">Suggested Strategy: {strategy}</p>
+            </form>
+          </div>
         </>
       );
     }
