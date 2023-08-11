@@ -9,6 +9,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import InfoPage from "./components/InfoPage";
+import "@blueprintjs/core/lib/css/blueprint.css";
 
 
 console.log("App Component Opened")
