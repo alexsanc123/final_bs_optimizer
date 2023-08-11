@@ -9,6 +9,7 @@ module World_state : sig
     ; mutable strategy : Strategy.t option
     ; mutable last_move : Card.t list option
     ; mutable game_log : string list option
+    ; mutable cards_to_use : Card.t list option
     }
   [@@deriving fields, sexp, jsonaf]
 

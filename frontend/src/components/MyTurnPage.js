@@ -35,6 +35,13 @@ function renderCard(card) {
   return renderImg(m[card]);
 }
 
+function renderCards(cards) {
+  const renderedCards = cards.map(card => renderCard(card));
+  return <div style={{display: 'flex', width: "100%", justifyContent:'center', alignItems: 'center', gap:"1rem"}}>{renderedCards}</div>
+}
+
+
+
 function MyTurnPage() {
   // console.log("OppTurn Function Opened");
 
@@ -77,6 +84,10 @@ function MyTurnPage() {
     );
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
+    const cardsToUse = world["cards_to_use"];
+    const qtyCardsToUse = cardsToUse.length;
+    console.log(qtyCardsToUse);
+    
     // const roundNum = currentGame["round_num"];
     // const pot = currentGame["pot"];
     const myId = currentGame["my_id"];
@@ -279,8 +290,17 @@ function MyTurnPage() {
           </div>
           <div className="App">
             <div>
-              <div>{renderCard(cardOnTurn[0])}</div>
-            </div>
+            <p className="text-box"> Game Log ... </p>
+          </div>
+          <div>
+          <p className="text-box">It's our turn to place down a(n) {cardOnTurn}</p>
+            <div>{renderCard(cardOnTurn[0])}</div>
+          </div>
+          <div>
+          <p className="text-box">Recommended cards to use: </p>
+           <div>
+            {renderCards(cardsToUse)}</div> 
+          </div>
 
             <form onSubmit={handleSubmit}>
               <div class="page-column">

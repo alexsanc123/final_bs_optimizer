@@ -74,8 +74,11 @@ h6 {
     font-size: 130%;
 }
 
-.card {
+.card.card.card {
   border-radius: 8px;
+  max-width: 10rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .suggested-strategy {
