@@ -86,6 +86,7 @@ function OppTurnPage() {
           if (resp === "No Showdown") {
             console.log("Refresh page");
 
+            setQImOn(1);
             numCardsPlacedRef.current.value = "";
             anyoneCalledRef.current.value = "";
             whoCalledRef.current.value = "";
@@ -119,6 +120,8 @@ function OppTurnPage() {
           }
           if (resp === "Next Turn") {
             console.log("AACKKKKK");
+            setQImOn(1);
+
             numCardsPlacedRef.current.value = "";
             anyoneCalledRef.current.value = "";
             whoCalledRef.current.value = "";
@@ -143,6 +146,8 @@ function OppTurnPage() {
           }
           if (resp == "Ack") {
             console.log("AACKKKKK");
+            setQImOn(1);
+
             numCardsPlacedRef.current.value = "";
             anyoneCalledRef.current.value = "";
             whoCalledRef.current.value = "";
