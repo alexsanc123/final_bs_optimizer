@@ -8,6 +8,7 @@ module World_state : sig
     ; mutable card_on_turn : Card.t option
     ; mutable strategy : Strategy.t option
     ; mutable last_move : Card.t list option
+    ; mutable game_log : string list option
     }
   [@@deriving fields, sexp, jsonaf]
 
