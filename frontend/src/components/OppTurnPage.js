@@ -192,7 +192,16 @@ function OppTurnPage() {
             interactive={true}
             elevation={Elevation.TWO}
           >
-            Game Log ...
+            {world["game_log"]}
+
+          </Card>
+          <Card
+            className="rec-log"
+            interactive={true}
+            elevation={Elevation.TWO}
+          >
+            <p>Recommendation: </p>
+            <p className="rec-txt">{recommendation}</p>
 
           </Card>
           <div>
