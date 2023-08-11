@@ -3,25 +3,25 @@ import { Redirect } from "react-router-dom";
 import FetchWorld from "../FetchWorld";
 import PlayingCardsList from './PlayingCardsList';
 
-function renderImg(src){
-  return <img class="card" src={PlayingCardsList[src]}/>
+function renderImg(card){
+  return <img class="card" src={PlayingCardsList[card]}/>
 }
 
 function renderCard(card) {
   const m = {
     'Ace': '1c',
-    'Two': '2c',
-    'Three': '3c',
-    'Four': '4c',
+    'Two': '2h',
+    'Three': '3s',
+    'Four': '4d',
     'Five': '5c',
-    'Six': '6c',
-    'Seven': '7c',
-    'Eight': '8c',
+    'Six': '6h',
+    'Seven': '7s',
+    'Eight': '8d',
     'Nine': '9c',
-    'Ten': '10c',
-    'Jack': 'jc',
-    'Queen': 'qc',
-    'King': 'kc',
+    'Ten': '10h',
+    'Jack': 'js',
+    'Queen': 'qd',
+    'King': 'kh',
   }
 
   return renderImg(m[card]);
@@ -67,7 +67,7 @@ function MyTurnPage() {
     // const playerCount = currentGame["player_count"];
     const strategy = world["strategy"].map(
       ([cardToProvide, ...cardsRecommended]) =>
-       ""+ cardToProvide + "- (" + cardsRecommended + ");  "
+       cardToProvide + "- (" + cardsRecommended + ");  "
     );
     const whoseTurn = world["whose_turn"];
     const cardOnTurn = world["card_on_turn"];
@@ -252,22 +252,12 @@ function MyTurnPage() {
             <div>
             <h2> Game Log ... </h2>
             <h2>Suggested Strategy: {strategy}</h2>
-	    <div class="suggested-strategy">
-	      {world['strategy'].map((card, ...cards) => 
-		 {
-		    return <><div>
-				 {renderCard(card)}
-				 </div><div>
-				 {cards.map(card => renderCard(card))}
-				 </div></>
-
-		 }
-
-	      )}
-	    </div>
+            
           </div>
           <div>
             <h2>It's our turn to place down a(n) {cardOnTurn}</h2>
+            <div>{renderCard(cardOnTurn[0])}</div>
+            
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -321,7 +311,7 @@ function MyTurnPage() {
             </button>
           </form></div>
           
-          <div>{JSON.stringify(PlayingCardsList)}</div>
+          
         </>
       );
     }
