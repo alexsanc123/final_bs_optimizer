@@ -9,6 +9,7 @@ module World_state = struct
     ; mutable strategy : Strategy.t option
     ; mutable last_move : Card.t list option
     ; mutable game_log : string list option
+    ; mutable cards_to_use : Card.t list option
     }
   [@@deriving fields, sexp, jsonaf]
 
@@ -19,6 +20,7 @@ module World_state = struct
     ; strategy = None
     ; last_move = None
     ; game_log = None
+    ; cards_to_use = None
     }
   ;;
 
@@ -29,6 +31,7 @@ module World_state = struct
     ; strategy = Some []
     ; last_move = None
     ; game_log = None
+    ; cards_to_use = None
     }
   ;;
 
@@ -38,7 +41,8 @@ module World_state = struct
     t.card_on_turn <- None;
     t.strategy <- None;
     t.last_move <- None;
-    t.game_log <- None
+    t.game_log <- None;
+    t.cards_to_use <- None
   ;;
 end
 

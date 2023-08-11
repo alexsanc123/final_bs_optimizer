@@ -61,6 +61,8 @@ let handler ~body:_ _sock req =
          let strategy =
            Turn_action.evaluate_strategies ~win_cycle ~game_state
          in
+         let _, cards_to_use = List.hd_exn strategy in
+         world_state.cards_to_use <- Some cards_to_use;
          world_state.current_game <- Some game_state;
          world_state.whose_turn <- Some 0;
          world_state.card_on_turn <- Some Card.Ace;
@@ -146,6 +148,17 @@ let handler ~body:_ _sock req =
              ]
          in
          world_state.game_log <- Some new_log;
+         let win_cycle =
+           Util_functions.calc_win_cycle
+             ~me:(Hashtbl.find_exn game.all_players game.my_id)
+             ~game_state:game
+         in
+         let strategy =
+           Turn_action.evaluate_strategies ~win_cycle ~game_state:game
+         in
+         let _, cards_to_use = List.hd_exn strategy in
+         world_state.cards_to_use <- Some cards_to_use;
+         world_state.strategy <- Some strategy;
          print_endline "Move Made";
          Server.respond_string ack_json_string ~headers:header))
   | "/check_bluff" ->
@@ -209,13 +222,13 @@ let handler ~body:_ _sock req =
          game.round_num <- game.round_num + 1;
          world_state.current_game <- Some game;
          let new_log =
-          game_log
-          @ [ "No one called player "
-              ^ Int.to_string (Game_state.whos_turn game).id
-              ^ "'s bluff."
-            ]
-        in
-        world_state.game_log <- Some new_log;
+           game_log
+           @ [ "No one called player "
+               ^ Int.to_string (Game_state.whos_turn game).id
+               ^ "'s bluff."
+             ]
+         in
+         world_state.game_log <- Some new_log;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
          let json_string = Message.string_to_json_msg "No Showdown" in
@@ -274,6 +287,17 @@ let handler ~body:_ _sock req =
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
+         let win_cycle =
+           Util_functions.calc_win_cycle
+             ~me:(Hashtbl.find_exn game.all_players game.my_id)
+             ~game_state:game
+         in
+         let strategy =
+           Turn_action.evaluate_strategies ~win_cycle ~game_state:game
+         in
+         let _, cards_to_use = List.hd_exn strategy in
+         world_state.cards_to_use <- Some cards_to_use;
+         world_state.strategy <- Some strategy;
          Server.respond_string ack_json_string ~headers:header))
   | "/my_showdown_lost" ->
     let query = My_showdown_lost.parse_my_showdown uri in
@@ -295,6 +319,17 @@ let handler ~body:_ _sock req =
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
+         let win_cycle =
+           Util_functions.calc_win_cycle
+             ~me:(Hashtbl.find_exn game.all_players game.my_id)
+             ~game_state:game
+         in
+         let strategy =
+           Turn_action.evaluate_strategies ~win_cycle ~game_state:game
+         in
+         let _, cards_to_use = List.hd_exn strategy in
+         world_state.cards_to_use <- Some cards_to_use;
+         world_state.strategy <- Some strategy;
          Server.respond_string ack_json_string ~headers:header))
   | "/my_showdown_won" ->
     let query = My_showdown_won.parse_my_showdown uri in
@@ -316,6 +351,17 @@ let handler ~body:_ _sock req =
          world_state.current_game <- Some game;
          world_state.whose_turn <- Some (Game_state.whos_turn game).id;
          world_state.card_on_turn <- Some (Game_state.card_on_turn game);
+         let win_cycle =
+          Util_functions.calc_win_cycle
+            ~me:(Hashtbl.find_exn game.all_players game.my_id)
+            ~game_state:game
+        in
+        let strategy =
+          Turn_action.evaluate_strategies ~win_cycle ~game_state:game
+        in
+        let _, cards_to_use = List.hd_exn strategy in
+        world_state.cards_to_use <- Some cards_to_use;
+        world_state.strategy <- Some strategy;
          Server.respond_string ack_json_string ~headers:header))
   | _ ->
     Server.respond_string ~status:`Not_found rej_json_string ~headers:header
