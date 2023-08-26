@@ -16,3 +16,4 @@ bs_solver/_build
 .c*
 .i*
 .d*
+node_modules
