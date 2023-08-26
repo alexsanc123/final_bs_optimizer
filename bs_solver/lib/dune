@@ -3,4 +3,5 @@
  (libraries async core core_unix.command_unix bignum cohttp-async jsonaf yojson)
  (inline_tests)
  (preprocess
-  (pps ppx_jane ppx_jsonaf_conv)))
+  (pps ppx_jane ppx_jsonaf_conv))
+  (modules_without_implementation "my_move 2"))
