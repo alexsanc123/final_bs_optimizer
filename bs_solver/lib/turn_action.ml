@@ -224,7 +224,6 @@ let evaluate_strategies ~(win_cycle : (Card.t * int) list) ~game_state
       let curr_score = score_strategy ~strategy:curr_strategy ~game_state in
       (* print_s[%message (strategy:Strategy.t)]; print_s[%message
          (score:float)]; *)
-      (*add any other additional scoring with increased functionality*)
       if Float.( < ) curr_score (2. *. score) then () else ();
       if Float.( < ) curr_score score
       then (

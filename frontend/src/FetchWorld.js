@@ -1,24 +1,13 @@
-import React, { useState, useEffect } from 'react';
+// console.log("FetchWorld Component Opened");
 
-function FetchWorld() {
-  const [data, setData] = useState(null);
+async function FetchWorld() {
+  // console.log("FetchWorld Function Opened");
+  const response = await fetch("http://localhost:8181/world_state");
+  const data = await response.json();
+  // console.log("FetchWorld Function Closed");
 
-  useEffect(() => {
-    // Fetch data from an API
-    fetch('http://localhost:8181/game_state')
-      .then(response => response.json())
-      .then(data => {  
-         console.log(data);
-          setData(data);
-       })
-      .catch(error => console.error(error));
-  }, []); // Empty dependency array means the effect runs once after initial render
-
-  return (
-       data === null ? null : JSON.stringify(data)
-    
-  );
+  return data;
 }
+// console.log("FetchWorld Component Closed");
 
-export default FetchWorld
-
+export default FetchWorld;

@@ -1,6 +1,16 @@
 open! Core
 open! Util_functions
 
+module Opp_rec = struct
+  type t =
+    { conflicting : bool * string
+    ; almost_win : bool * string
+    ; useful : bool * string
+    ; probability : string
+    }
+  [@@deriving fields]
+end
+
 let conflicting_claim
   ~(game_state : Game_state.t)
   ~(claim : int * Card.t * int)
@@ -95,8 +105,8 @@ let probability_based_call
       ~significant_digits:3
       ((1. -. probability) *. 100.0)
   in
-  print_endline
-    ("Probability the player is lying: " ^ Float.to_string prob_of_lie ^ "%");
+  (* print_endline ("Probability the player is lying: " ^ Float.to_string
+     prob_of_lie ^ "%"); *)
   (* (let player_bluffs = (Hashtbl.find_exn game_state.all_players
      who_claimed).bluffs in let pot_size = List.length game_state.pot in let
      my_hand_size = (Hashtbl.find_exn game_state.all_players
@@ -112,12 +122,23 @@ let probability_based_call
   (* (let strategy_without_lies = List.for_all strategy ~f:(fun move -> not
      (Strategy.move_is_bluff move)) in let threshold = if
      strategy_without_lies then 100.0 else 75.0 in) *)
-  Float.( >. ) prob_of_lie 75.0
+  if Float.( >. ) prob_of_lie 75.0
+  then
+    "Call your opponent's bluff. Probability the player is \
+     lying: "
+    ^ Float.to_string prob_of_lie
+    ^ "%"
+  else
+    "Don't call your opponent's bluff. Probability the \
+     player is lying: "
+    ^ Float.to_string prob_of_lie
+    ^ "%"
 ;;
 
 let assess_calling_bluff
   ~(game_state : Game_state.t)
   ~(claim : int * Card.t * int)
+  : Opp_rec.t
   =
   (*Runs through the different strategies to see if someone is bluffing or
     not. Strategy 1: If their claim conflicts woith the cards I currently
@@ -125,6 +146,22 @@ let assess_calling_bluff
     win the game, call bluff. Strategy 3: If the pot is less than 5 and the
     card they are claiming is within the next 4 of my win cycle, call the
     bluff. *)
+  let opp_id, _, _ = claim in
+  let opp = Hashtbl.find_exn game_state.all_players opp_id in
+  { conflicting =
+      ( conflicting_claim ~game_state ~claim
+      , "Probability the opponent is lying: 100%" )
+  ; almost_win = opp.hand_size = 0, "Your opponent is about to win the game."
+  ; useful =
+      ( useful_call ~game_state ~claim
+      , "The pot is small and you need one of these cards in your win cycle."
+      )
+  ; probability = probability_based_call ~game_state ~claim
+  }
+;;
+
+let assess_bluff ~(game_state : Game_state.t) ~(claim : int * Card.t * int) =
+  (*for command line tool sicne i messed up the one above lol *)
   let opp_id, _, _ = claim in
   let opp = Hashtbl.find_exn game_state.all_players opp_id in
   if conflicting_claim ~game_state ~claim
@@ -138,9 +175,18 @@ let assess_calling_bluff
   else if useful_call ~game_state ~claim
   then (
     print_endline
-      "The pot is small and you need one of these cards in your win cycle.";
+      "The pot is small and you need one of these cards to complete your \
+       cycle.";
     true)
-  else probability_based_call ~game_state ~claim
+  else (
+    let probability = prob_no_lie ~game_state ~claim in
+    let prob_of_lie =
+      Float.round_significant
+        ~significant_digits:3
+        ((1. -. probability) *. 100.0)
+    in
+    print_s [%message "Prob that player is lyying" (prob_of_lie : float)];
+    Float.( >. ) prob_of_lie 75.0)
 ;;
 
 (* let check_opponent_win ~(game_state : Game_state.t) ~(claim : int * Card.t
