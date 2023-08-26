@@ -7,6 +7,6 @@ type t =
   ; mutable cards : (int * int) Card.Table.t
   ; mutable calls : int
   }
-[@@deriving sexp, fields]
+[@@deriving sexp, fields, jsonaf]
 
 include Stringable.S with type t := t

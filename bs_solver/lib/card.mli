@@ -14,7 +14,7 @@ type t =
   | Jack
   | Queen
   | King
-[@@deriving sexp, compare, hash, equal]
+[@@deriving sexp, compare, hash, equal, jsonaf]
 
 val of_int : int -> t
 val of_char : char -> t

@@ -61,19 +61,19 @@ let game_init () =
   let my_cards = declare_my_cards ~my_pos ~player_count in
   let all_players = Int.Table.create () in
   let _ =
-    List.init player_count ~f:(fun player_id ->
+    List.init player_count ~f:(fun id_r_dealer ->
       assert (player_count > 3);
       let cards =
-        if my_pos = player_id then my_cards else My_cards.init ()
+        if my_pos = id_r_dealer then my_cards else My_cards.init ()
       in
-      let true_pos = find_true_pos ~pos:player_id ~ace_pos ~player_count in
+      let true_pos = find_true_pos ~pos:id_r_dealer ~ace_pos ~player_count in
       Hashtbl.set
         all_players
         ~key:true_pos
         ~data:
           { Player.id = true_pos
           ; hand_size =
-              (if my_pos < 52 % player_count
+              (if id_r_dealer < 52 % player_count
                then (52 / player_count) + 1
                else 52 / player_count)
           ; bluffs = 0
@@ -102,9 +102,7 @@ let bluff_recomendation ~game ~claim =
   print_endline
     {|*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 Reccomendation: |};
-  let should_i_call =
-    Call_actions.assess_calling_bluff ~game_state:game ~claim
-  in
+  let should_i_call = Call_actions.assess_bluff ~game_state:game ~claim in
   print_endline ("Should I Call: " ^ Bool.to_string should_i_call);
   print_endline
     "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
@@ -303,6 +301,7 @@ let opp_moves game =
 ;;
 
 let rec play_game ~(game : Game_state.t) =
+  print_s [%message (game : Game_state.t)];
   print_endline
     {|------------------------------------------------------------------------------
 ------------------------------------------------------------------------------|};

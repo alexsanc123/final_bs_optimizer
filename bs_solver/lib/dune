@@ -1,6 +1,6 @@
 (library
  (name bs_solver)
- (libraries async core core_unix.command_unix bignum)
+ (libraries async core core_unix.command_unix bignum cohttp-async jsonaf yojson)
  (inline_tests)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane ppx_jsonaf_conv)))

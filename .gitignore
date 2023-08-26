@@ -4,6 +4,8 @@ bs_solver/_build
 .merlin
 *.corrected
 
+frontend/node_modules
+
 # vim swap files
 *.swp
 *.swo

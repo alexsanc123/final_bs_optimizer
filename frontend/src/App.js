@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import StartPage from "./components/StartPage";
+import MyTurnPage from "./components/MyTurnPage";
+import OppTurnPage from "./components/OppTurnPage";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from "react-router-dom";
+import InfoPage from "./components/InfoPage";
+import "@blueprintjs/core/lib/css/blueprint.css";
 
+
+console.log("App Component Opened")
 function App() {
+  console.log("App Function Opened")
+  console.log("App Function Closed")
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          BS optimizer by Justin and Alex
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route path="/" exact component={StartPage} />
+        <Route path="/infopage" component={InfoPage} />
+        <Route path="/myturn" component={MyTurnPage} />
+        <Route path="/oppturn" component={OppTurnPage} />
+        <Redirect to="/infopage" />
+      </Switch>
+    </Router>
   );
 }
-
+console.log("App Component Closed")
 export default App;
